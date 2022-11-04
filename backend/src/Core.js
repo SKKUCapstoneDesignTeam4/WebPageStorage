@@ -1,5 +1,7 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
+import fs from "fs";
+import sharp from "sharp";
 
 import { DB } from "./DB.js";
 import { logger } from "./Logger.js";
@@ -140,24 +142,25 @@ export class Core
         return DB.getPages(params, fromArchieved);
     }
 
-    async insertPage(info, urlInElement)
+    async insertPage(info)
     {
-        const dbRes = await DB.insertPage(info);
-        info._id = dbRes._id;
+        const resId = await DB.insertPage(info);
+        info.id = resId;
 
-        let newImagePath;
+        let newThumbnailPath;
         try {
-            newImagePath = await this.saveImage(info._id, info.imageUrl);
+            newThumbnailPath = await this.saveThumbnail(info.ownerUserId, info.id, info.thumbnailUrl);
         } catch (e) {
-            newImagePath = "";
+            newThumbnailPath = "";
         }
+        info.thumbnailUrl = newThumbnailPath;
 
         await Promise.all([
-            DB.updatePage(info._id, { imageUrl: newImagePath }),
-            DB.updateWebSite(info.siteId, { lastUrl: urlInElement })
+            DB.updatePage(info.ownerUserId, info.id, { thumbnailUrl: newThumbnailPath }),
+            DB.updateWebSite(info.ownerUserId, info.siteId, { lastUrl: info.url })
         ]);
 
-        logger.info(`Core: Added a new page. (Site id: ${info.siteId})\n        id: ${info._id} / title: ${info.title}`);
+        logger.info(`Core: Added a new page. (Site id: ${info.siteId})\n        id: ${info.id} / title: ${info.title}`);
     }
 
     async removePage(id, withData)
@@ -206,8 +209,22 @@ export class Core
         const pageUrl = relToAbsUrl(aElement.attribs.href, webSiteInfo.url);
     }
 
-    async saveThumbnail()
+    async saveThumbnail(userId, pageId, url)
     {
+        if(url == "") {
+            return "";
+        }
+    
+        const localDirPath = `static_data/${userId}/thumbnails/`;
+        if(fs.existsSync(localDirPath) == false) {
+            await fs.promises.mkdir(localDirPath, { recursive: true });
+        }
 
+        const localPath = localDirPath + `${pageId}.png`;
+
+        const thumbnailData = await axios.get(url, { responseType: 'arraybuffer' });
+        await sharp(thumbnailData.data).resize(400, null, { withoutEnlargement: true }).png().toFile(localPath);
+        
+        return localPath;
     }
 }

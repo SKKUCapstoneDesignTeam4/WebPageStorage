@@ -392,6 +392,4 @@ export class APIServer
             throw new InvalidRequestError(`MissingRequiredParametersError (${notExistedParams.join(", ")})`, 400);
         }
     }
-
-    
 }
