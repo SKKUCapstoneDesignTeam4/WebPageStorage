@@ -137,9 +137,9 @@ export class Core
         }
     }
 
-    async getPages(params, fromArchieved)
+    async getPages(userId, params)
     {
-        return DB.getPages(params, fromArchieved);
+        return DB.getPages(userId, params);
     }
 
     async insertPage(info)

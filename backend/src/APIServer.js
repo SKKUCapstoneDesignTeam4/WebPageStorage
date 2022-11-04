@@ -256,21 +256,20 @@ export class APIServer
         ctx.body = token;
     }
 
-    // GET: /api/pages (Not implemented)
+    // GET: /api/pages
     async getPages(ctx, next)
     {
         const params = ctx.query;
-        const startIndex = parseInt(params.startIndex);
-
-        if(startIndex < 0) {
-            ctx.response.status = 400;
-            return;
-        }
 
         try 
         {
+            const res = await this.core.getPages(ctx.state.userId, {
+                afterId: params.afterId,
+                count: parseInt(params.count)
+            });
+
             ctx.response.status = 200;
-            ctx.body = 'getPages';
+            ctx.body = res;
         } catch(e) {
             e.message += `\n        Request parameters: ${JSON.stringify(params)}`;
             throw e;
