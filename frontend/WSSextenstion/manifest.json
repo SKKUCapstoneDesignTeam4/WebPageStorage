@@ -1,0 +1,25 @@
+{
+    "author": "Dohwan Kim",
+    "manifest_version": 2,
+    "name": "WSS_extension",
+    "description": "WSS_extension",
+    "version": "0.0.1",
+    "version_name": "test",
+
+    "browser_action": {
+        "default_icon": "icon.png",
+        "default_popup": "index.html"
+    },
+
+    "icons": {
+        "128": "icon.png"
+    },
+
+    "permissions": [
+        "activeTab", "http://*/*", "https://*/*"
+    ],
+
+    "background":{
+        "service_worker":"background.js"
+    }
+}

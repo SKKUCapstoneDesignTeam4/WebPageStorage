@@ -1,0 +1,60 @@
+@import '~antd/dist/antd.css';
+
+.title {
+    color: aliceblue;
+    padding-left: 250px;
+}
+
+.table {
+    background-color: darkgrey;
+    width: 1200px;
+    border: 2px;
+    border-color: aliceblue;
+    align-content: center;
+    padding-left: 300px;
+
+}
+
+th {
+    border: 1px solid #444444;
+    height: 30px;
+    background-color: antiquewhite;
+}
+
+tr,
+td {
+    border: 1px solid #444444;
+    height: 30px;
+    background-color: aliceblue;
+}
+
+.name {
+    width: 30px;
+}
+
+.input2 {
+    width: 100%;
+}
+
+.input3 {
+    width: 100%;
+}
+
+.pmbutton {
+    width: 5px;
+}
+
+.Menu-Button {
+    color: white;
+    background-color: rgb(0,21,41);
+    border: 0ch;
+}
+
+.Menu-Button:hover{
+    background-color: rgb(0,21,41);
+}
+
+.Category-title{
+    font-weight: bold;
+    font-size: 24px;
+}

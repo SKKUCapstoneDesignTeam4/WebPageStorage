@@ -1,0 +1,23 @@
+@import '~antd/dist/antd.css';
+
+.Title-area {
+  background-color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items:center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.Login-area {
+    background-color: #0041b3;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+  }
