@@ -276,11 +276,11 @@ export class APIServer
         }
     }
 
-    // DELETE: /api/page/:id (Not implemented)
+    // DELETE: /api/page/:id
     async removePage(ctx, next)
     {
         try {
-            //await this.core.deletePage(ctx.params.id);
+            await this.core.removePage(ctx.state.userId, ctx.params.id);
 
             ctx.status = 204;
         } catch(e) {

@@ -1,6 +1,7 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 import moment from "moment"
+import rimraf from "rimraf";
 
 export function relToAbsUrl(url, baseUrl)
 {
@@ -12,6 +13,16 @@ export function relToAbsUrl(url, baseUrl)
         const u = new URL(url, baseUrl);
         return u.toString();
     }
+}
+
+export function rimrafPromise(path) {
+    return new Promise(function(resolve, reject) {
+        rimraf(path, function(e) {
+            if(e) return reject(e);
+
+            resolve();
+        });
+    });
 }
 
 export async function getPageInfo(pageUrl)

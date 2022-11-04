@@ -39,3 +39,6 @@ dist/**/*
 
 # DB
 *.db
+
+# Static data
+static_data

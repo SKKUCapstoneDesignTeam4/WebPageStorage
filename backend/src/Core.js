@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { DB } from "./DB.js";
 import { logger } from "./Logger.js";
 import { WebSiteWatcher } from "./WebSiteWatcher.js";
-import { relToAbsUrl } from "./Utility.js";
+import { rimrafPromise, relToAbsUrl } from "./Utility.js";
 import { InvalidRequestError } from "./Error.js";
 
 export class Core
@@ -65,7 +65,6 @@ export class Core
     {
         return await DB.getWebSites(userId);
     }
-
 
     async addWebSite(info)
     {
@@ -163,21 +162,23 @@ export class Core
         logger.info(`Core: Added a new page. (Site id: ${info.siteId})\n        id: ${info.id} / title: ${info.title}`);
     }
 
-    async removePage(id, withData)
+    async removePage(userId, id, withThumbnail = true)
     {
-        if(withData) {
+        const res = await DB.deletePage(userId, id);
+
+        if(res == 0) {
+            throw new InvalidRequestError("Page not found", 404);
+        }
+
+        if(withThumbnail) {
             try {
-              await rimrafPromise(`page_data/${id}`);
+              await fs.promises.unlink(`static_data/${userId}/thumbnails/${id}.png`)
             } catch(e) {
                 logger.warn(`Core: Failed to delete the page data.\n        id: ${id}\n        ${e}`);
             }
         }
 
-        const res = await DB.deletePage(id);
-
-        if(res == 0) {
-            throw new PageNotFoundError(id);
-        } else {
+        if(res > 0) {
             logger.info(`Core: Deleted the page.\n        id: ${id}`);
         }
     }
