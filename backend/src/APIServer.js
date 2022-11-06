@@ -300,7 +300,7 @@ export class APIServer
         }
 
         try {
-            // await this.core.readPage(ctx.params.id, setUnread);
+            await this.core.readPage(ctx.params.id, setUnread);
 
             ctx.status = 204;
         } catch(e) {
