@@ -27,12 +27,12 @@ interface DataType {
 const columns: ColumnsType<DataType> = [
 {
     title: 'Name',
-    dataIndex: 'name',
+    dataIndex: 'title',
     key: 'name',
 },
 {
     title: 'Address',
-    dataIndex: 'address',
+    dataIndex: 'url',
     key: 'address',
 },
 {
@@ -56,13 +56,33 @@ export default function Registered() {
 
     const [collapsed, setCollapsed] = useState(false);
 
-    const [datas, setData] = useState([]);
 
-
+    const [datas, setDatas]=useState();
 
     function toggleError(){
         SetError(!iserror);
     }
+
+    const getSites= async () => {
+        try {
+            const response = await axios({
+                url: "http://localhost:4000/api/sites",
+                method: "get",
+                headers: {
+                    "x-access-token" : cookies.get('access_token')
+                },
+            });
+            console.log(response.data);
+            setDatas(response.data);
+            
+        }
+        catch(ex){
+            SetErrorString("Can't get sites");
+            toggleError();
+            return;
+        }
+    }
+
 
     const addSite = async () => {
         if (name===""){
@@ -75,7 +95,6 @@ export default function Registered() {
             toggleError();
             return;
         }
-
         try {
             const response = await axios({
                 url: "http://localhost:4000/api/site",
@@ -90,9 +109,8 @@ export default function Registered() {
                     cssSelector: css
                 }
             });
-            if(response.status === 200){
-                console.log(response.status)
-            }
+            console.log(response.status)
+            getSites()
         }
         catch(ex){
             SetErrorString("Can't add site");
@@ -101,6 +119,7 @@ export default function Registered() {
         }
     }
 
+    getSites()
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Header className="site-layout-background" style={{ padding: 0 }}>
