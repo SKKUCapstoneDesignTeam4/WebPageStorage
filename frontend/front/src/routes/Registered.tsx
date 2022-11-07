@@ -6,7 +6,7 @@ import {
     MenuUnfoldOutlined,
 } from '@ant-design/icons';
 
-import {Button, Breadcrumb, Input, Layout, Col, Row, Table, Typography } from 'antd';
+import {Button, Breadcrumb, Input, Layout, Col, Row, Table, Typography, Popconfirm } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 import SideMenu from '../components/SideMenu';
@@ -16,31 +16,6 @@ import Cookies from "universal-cookie";
 
 const { Header, Content, Sider } = Layout;
 const {Text } = Typography;
-
-interface DataType {
-    key: string;
-    name: string;
-    address: string;
-    Description: string;
-}
-
-const columns: ColumnsType<DataType> = [
-{
-    title: 'Name',
-    dataIndex: 'title',
-    key: 'name',
-},
-{
-    title: 'Address',
-    dataIndex: 'url',
-    key: 'address',
-},
-{
-    title: 'Description',
-    dataIndex: 'description',
-    key: 'description',
-},
-];
 
 const cookies = new Cookies();
 
@@ -57,7 +32,7 @@ export default function Registered() {
     const [collapsed, setCollapsed] = useState(false);
 
 
-    const [datas, setDatas]=useState();
+    const [datas, setDatas]=useState([]);
 
     function toggleError(){
         SetError(!iserror);
@@ -72,7 +47,6 @@ export default function Registered() {
                     "x-access-token" : cookies.get('access_token')
                 },
             });
-            console.log(response.data);
             setDatas(response.data);
             
         }
@@ -82,6 +56,57 @@ export default function Registered() {
             return;
         }
     }
+
+    const handleDelete = async (id: string) => {
+        try {
+            const response = await axios({
+                url: `http://localhost:4000/api/site/${id}`,
+                method: "delete",
+                headers: {
+                    "x-access-token" : cookies.get('access_token')
+                },
+            });
+            getSites();
+            
+        }
+        catch(ex){
+            SetErrorString("Can't remove sites");
+            toggleError();
+            return;
+        }
+      };
+    
+    interface DataType {
+        key: string;
+        name: string;
+        address: string;
+        Description: string;
+    }
+    
+    const columns: ColumnsType<DataType> = [
+    {
+        title: 'Name',
+        dataIndex: 'title',
+        key: 'name',
+    },
+    {
+        title: 'Address',
+        dataIndex: 'url',
+        key: 'address',
+    },
+    {
+        title: 'Description',
+        dataIndex: 'description',
+        key: 'description',
+    },
+    {
+        title: 'operation',
+        dataIndex: 'id',
+        render: (text) =>(
+            <Button onClick={() => handleDelete(text)}>delete</Button>
+          )
+      },
+    ];
 
 
     const addSite = async () => {
@@ -118,6 +143,8 @@ export default function Registered() {
             return;
         }
     }
+
+    
 
     getSites()
     return (
