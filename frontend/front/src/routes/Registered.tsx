@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import './Registered.css';
-import axios from 'axios'
+import axios from 'axios';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
 } from '@ant-design/icons';
 
-import {Button, Breadcrumb, Input, Layout, Col, Row, Table, Typography, Popconfirm } from 'antd';
+import { Button, Breadcrumb, Input, Layout, Col, Row, Table, Typography, Popconfirm } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 import SideMenu from '../components/SideMenu';
@@ -15,7 +15,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import Cookies from "universal-cookie";
 
 const { Header, Content, Sider } = Layout;
-const {Text } = Typography;
+const { Text } = Typography;
 
 const cookies = new Cookies();
 
@@ -26,31 +26,31 @@ export default function Registered() {
     const [address, SetAddress] = React.useState("");
     const [description, SetDescription] = React.useState("");
     const [css, SetCSS] = React.useState("");
-    const [iserror, SetError]= React.useState(false);
-    const [errorstring, SetErrorString]= React.useState("");
+    const [iserror, SetError] = React.useState(false);
+    const [errorstring, SetErrorString] = React.useState("");
 
     const [collapsed, setCollapsed] = useState(false);
 
 
-    const [datas, setDatas]=useState([]);
+    const [datas, setDatas] = useState<DataType[]>([]);
 
-    function toggleError(){
+    function toggleError() {
         SetError(!iserror);
     }
 
-    const getSites= async () => {
+    const getSites = async () => {
         try {
             const response = await axios({
                 url: "http://localhost:4000/api/sites",
                 method: "get",
                 headers: {
-                    "x-access-token" : cookies.get('access_token')
+                    "x-access-token": cookies.get('access_token')
                 },
             });
             setDatas(response.data);
-            
+
         }
-        catch(ex){
+        catch (ex) {
             SetErrorString("Can't get sites");
             toggleError();
             return;
@@ -63,59 +63,59 @@ export default function Registered() {
                 url: `http://localhost:4000/api/site/${id}`,
                 method: "delete",
                 headers: {
-                    "x-access-token" : cookies.get('access_token')
+                    "x-access-token": cookies.get('access_token')
                 },
             });
             getSites();
-            
+
         }
-        catch(ex){
+        catch (ex) {
             SetErrorString("Can't remove sites");
             toggleError();
             return;
         }
-      };
-    
+    };
+
     interface DataType {
         key: string;
         name: string;
         address: string;
         Description: string;
     }
-    
+
     const columns: ColumnsType<DataType> = [
-    {
-        title: 'Name',
-        dataIndex: 'title',
-        key: 'name',
-    },
-    {
-        title: 'Address',
-        dataIndex: 'url',
-        key: 'address',
-    },
-    {
-        title: 'Description',
-        dataIndex: 'description',
-        key: 'description',
-    },
-    {
-        title: 'operation',
-        dataIndex: 'id',
-        render: (text) =>(
-            <Button onClick={() => handleDelete(text)}>delete</Button>
-          )
-      },
+        {
+            title: 'Name',
+            dataIndex: 'title',
+            key: 'name',
+        },
+        {
+            title: 'Address',
+            dataIndex: 'url',
+            key: 'address',
+        },
+        {
+            title: 'Description',
+            dataIndex: 'description',
+            key: 'description',
+        },
+        {
+            title: 'operation',
+            dataIndex: 'id',
+            render: (text) => (
+                <Button onClick={() => handleDelete(text)}>delete</Button>
+            )
+        },
     ];
 
 
     const addSite = async () => {
-        if (name===""){
+        if (name === "") {
             SetErrorString("Please type name");
             toggleError();
             return;
         }
-        if (address===""){
+        if (address === "") {
             SetErrorString("Please type address");
             toggleError();
             return;
@@ -125,7 +125,7 @@ export default function Registered() {
                 url: "http://localhost:4000/api/site",
                 method: "post",
                 headers: {
-                    "x-access-token" : cookies.get('access_token')
+                    "x-access-token": cookies.get('access_token')
                 },
                 data: {
                     title: name,
@@ -137,14 +137,14 @@ export default function Registered() {
             console.log(response.status)
             getSites()
         }
-        catch(ex){
+        catch (ex) {
             SetErrorString("Can't add site");
             toggleError();
             return;
         }
     }
 
-    
+
 
     getSites()
     return (
@@ -152,7 +152,7 @@ export default function Registered() {
             <Header className="site-layout-background" style={{ padding: 0 }}>
                 <Row>
                     <Col>
-                        <Button className="Menu-Button" onClick={()=>setCollapsed((prev)=>!prev)} style={{ marginBottom: 16 }}>
+                        <Button className="Menu-Button" onClick={() => setCollapsed((prev) => !prev)} style={{ marginBottom: 16 }}>
                             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                         </Button>
                     </Col>
@@ -171,46 +171,46 @@ export default function Registered() {
                             Registered Sites
                         </Breadcrumb.Item>
                     </Breadcrumb>
-                    <Table columns={columns} dataSource={datas}/>
+                    <Table columns={columns} dataSource={datas} />
                     <Row justify='center'>
                         <Col >
-                            <Text strong>New Site</Text> 
+                            <Text strong>New Site</Text>
                         </Col>
                         <Col offset={1}>
                             <Input
                                 id="Name"
                                 placeholder="Name"
-                                value={name} 
-                                onChange={({ target: {value} }) => SetName(value)} 
+                                value={name}
+                                onChange={({ target: { value } }) => SetName(value)}
                             />
                         </Col>
                         <Col>
                             <Input
                                 id="Address"
                                 placeholder="Address"
-                                value={address} 
-                                onChange={({ target: {value} }) => SetAddress(value)} 
+                                value={address}
+                                onChange={({ target: { value } }) => SetAddress(value)}
                             />
                         </Col>
                         <Col>
                             <Input
                                 id="Description"
                                 placeholder="Description"
-                                value={description} 
-                                onChange={({ target: {value} }) => SetDescription(value)} 
+                                value={description}
+                                onChange={({ target: { value } }) => SetDescription(value)}
                             />
                         </Col>
                         <Col>
                             <Input
                                 id="CSS"
                                 placeholder="CSS"
-                                value={css} 
-                                onChange={({ target: {value} }) => SetCSS(value)} 
+                                value={css}
+                                onChange={({ target: { value } }) => SetCSS(value)}
                             />
                         </Col>
                         <Col>
                             <Button onClick={addSite}>Add</Button>
-                            {iserror ? <ErrorMessage title="Registration Error" message={errorstring} func={toggleError}/> : ""}
+                            {iserror ? <ErrorMessage title="Registration Error" message={errorstring} func={toggleError} /> : ""}
                         </Col>
                     </Row>
                 </Content>
