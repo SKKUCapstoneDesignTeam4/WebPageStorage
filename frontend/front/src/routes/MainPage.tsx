@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Breadcrumb, Button, Card, Layout, Row, Col, } from 'antd';
+import { Breadcrumb, Button, Card, Layout, Row, Col, message } from 'antd';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -14,27 +14,23 @@ import Cookies from "universal-cookie";
 const cookies = new Cookies();
 
 const { Header, Content, Sider, } = Layout;
-
+const {Meta} = Card;
+interface DataType {
+    desc: string;
+    id: string;
+    isRead: string;
+    ownerUserId: string;
+    siteId: string;
+    thumbnailUrl: string;
+    time: string;
+    title: string;
+    url: string;
+}
 
 export default function MainPage() {
-
-    const [name, SetName] = React.useState("");
-    const [address, SetAddress] = React.useState("");
-    const [description, SetDescription] = React.useState("");
-    const [css, SetCSS] = React.useState("");
-    const [iserror, SetError] = React.useState(false);
-    const [errorstring, SetErrorString] = React.useState("");
-
-    const [thumbnailUrl, SetthumbnailUrl] = React.useState("");
-
-
-
-
+    const [collapsed, setCollapsed] = useState(false);
     const [datas, setDatas] = useState<DataType[]>([]);
 
-    function toggleError() {
-        SetError(!iserror);
-    }
 
     const getPages = async () => {
         try {
@@ -49,8 +45,7 @@ export default function MainPage() {
             console.log(datas);
         }
         catch (ex) {
-            SetErrorString("Can't get sites");
-            toggleError();
+            message.error("Can't get ages")
             return;
         }
     }
@@ -58,52 +53,19 @@ export default function MainPage() {
 
     getPages();
 
-
-    interface DataType {
-        desc: string;
-        id: string;
-        isRead: string;
-        ownerUserId: string;
-        siteId: string;
-        thumbnailUrl: string;
-        time: string;
-        title: string;
-        url: string;
-    }
-
-
-    const [collapsed, setCollapsed] = useState(false);
+    
     const cols_new = [];
-    const colCount = 6;
-    for (let i = 0; i < colCount; i++) {
+    for (let i = 0; i < datas.length; i++) {
         cols_new.push(
-            <Col key={i.toString()} span={24 / colCount}>
+            <Col key={i.toString()}>
                 <div>
-                    <Card title="Card title" bordered={false} style={{ width: 350 }}>
-                        <p>New webpage</p>
-                        <p>{datas[1].id}</p>
-                        <p>show</p>
+                    <Card title={datas[i].title} hoverable style={{ width: 350 }} cover={<img alt="thumnail" src="http://localhost:4000/static_data/4/thumbnails/5.png"/>}>
+                        <Meta title={datas[i].title} description={datas[i].url} />
                     </Card>
                 </div>
             </Col>,
         );
     }
-
-    const cols_Bookmark = [];
-    for (let i = 0; i < colCount; i++) {
-        cols_Bookmark.push(
-            <Col key={i.toString()} span={24 / colCount}>
-                <div>
-                    <Card title="Card title" bordered={false} style={{ width: 350 }}>
-                        <p>Bookmark</p>
-                        <p>Will</p>
-                        <p>Show</p>
-                    </Card>
-                </div>
-            </Col>,
-        );
-    }
-
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
@@ -144,7 +106,7 @@ export default function MainPage() {
                         </Breadcrumb.Item>
                     </Breadcrumb>
                     <Row gutter={[0, 24]} style={{ minHeight: 520 }}>
-                        {cols_Bookmark}
+
                     </Row>
                 </Content>
             </Layout>
