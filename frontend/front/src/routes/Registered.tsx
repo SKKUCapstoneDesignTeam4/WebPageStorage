@@ -11,7 +11,6 @@ import type { ColumnsType } from 'antd/es/table';
 
 import SideMenu from '../components/SideMenu';
 import ErrorMessage from '../components/ErrorMessage';
-
 import Cookies from "universal-cookie";
 
 const { Header, Content, Sider } = Layout;
