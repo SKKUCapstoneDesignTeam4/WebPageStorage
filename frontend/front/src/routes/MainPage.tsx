@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Breadcrumb, Button, Card, Layout, Row, Col, message } from 'antd';
 import {
@@ -42,7 +42,6 @@ export default function MainPage() {
                 },
             });
             setDatas(response.data);
-            console.log(datas);
         }
         catch (ex) {
             message.error("Can't get ages")
@@ -50,8 +49,10 @@ export default function MainPage() {
         }
     }
 
+    useEffect(() => {
+        getPages();
+    },[]);
 
-    getPages();
 
     
     const cols_new = [];
@@ -59,8 +60,8 @@ export default function MainPage() {
         cols_new.push(
             <Col key={i.toString()}>
                 <div>
-                    <Card title={datas[i].title} hoverable style={{ width: 350 }} cover={<img alt="thumnail" src="http://localhost:4000/static_data/4/thumbnails/5.png"/>}>
-                        <Meta title={datas[i].title} description={datas[i].url} />
+                    <Card title={datas[i].title} hoverable style={{ width: 350 }} cover={<img alt="thumnail" src={datas[i].thumbnailUrl}/>} onClick={()=>window.open(`${datas[i].url}`)}>
+                        <Meta title={datas[i].title} description={datas[i].url}></Meta> 
                     </Card>
                 </div>
             </Col>,
