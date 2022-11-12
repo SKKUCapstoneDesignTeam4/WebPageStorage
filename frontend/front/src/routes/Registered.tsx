@@ -6,11 +6,10 @@ import {
     MenuUnfoldOutlined,
 } from '@ant-design/icons';
 
-import { Button, Breadcrumb, Input, Layout, Col, Row, Table, Typography, Popconfirm } from 'antd';
+import { Button, Breadcrumb, Input, Layout, Col, Row, Table, Typography, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 import SideMenu from '../components/SideMenu';
-import ErrorMessage from '../components/ErrorMessage';
 import Cookies from "universal-cookie";
 
 const { Header, Content, Sider } = Layout;
@@ -25,17 +24,10 @@ export default function Registered() {
     const [address, SetAddress] = React.useState("");
     const [description, SetDescription] = React.useState("");
     const [css, SetCSS] = React.useState("");
-    const [iserror, SetError] = React.useState(false);
-    const [errorstring, SetErrorString] = React.useState("");
-
     const [collapsed, setCollapsed] = useState(false);
 
 
     const [datas, setDatas] = useState<DataType[]>([]);
-
-    function toggleError() {
-        SetError(!iserror);
-    }
 
     const getSites = async () => {
         try {
@@ -50,8 +42,7 @@ export default function Registered() {
 
         }
         catch (ex) {
-            SetErrorString("Can't get sites");
-            toggleError();
+            message.error("Can't get sites")
             return;
         }
     }
@@ -72,8 +63,7 @@ export default function Registered() {
 
         }
         catch (ex) {
-            SetErrorString("Can't remove sites");
-            toggleError();
+            message.error("Can't remove sites");
             return;
         }
     };
@@ -113,13 +103,11 @@ export default function Registered() {
 
     const addSite = async () => {
         if (name === "") {
-            SetErrorString("Please type name");
-            toggleError();
+            message.error("Please type name");
             return;
         }
         if (address === "") {
-            SetErrorString("Please type address");
-            toggleError();
+            message.error("Please type address");
             return;
         }
         try {
@@ -140,8 +128,7 @@ export default function Registered() {
             getSites()
         }
         catch (ex) {
-            SetErrorString("Can't add site");
-            toggleError();
+            message.error("Can't add site");
             return;
         }
     }
@@ -212,7 +199,6 @@ export default function Registered() {
                         </Col>
                         <Col>
                             <Button onClick={addSite}>Add</Button>
-                            {iserror ? <ErrorMessage title="Registration Error" message={errorstring} func={toggleError} /> : ""}
                         </Col>
                     </Row>
                 </Content>

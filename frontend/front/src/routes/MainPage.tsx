@@ -18,7 +18,7 @@ const {Meta} = Card;
 interface DataType {
     desc: string;
     id: string;
-    isRead: string;
+    isRead: boolean;
     ownerUserId: string;
     siteId: string;
     thumbnailUrl: string;
@@ -54,17 +54,63 @@ export default function MainPage() {
     },[]);
 
 
-    
+    const deletePage = async (id:string) => {
+        try {
+            const response = await axios({
+                url: `http://localhost:4000/api/page/${id}`,
+                method: "delete",
+                headers: {
+                    "x-access-token": cookies.get('access_token')
+                },
+            });
+            getPages();
+        }
+        catch (ex) {
+            message.error("Can't delete page")
+            return;
+        }
+    }
+
+    const openPage = async (id:string, url:string) => {
+        window.open(url);
+        
+        try {
+            const response = await axios({
+                url: `http://localhost:4000/api/page/read/${id}`,
+                method: "put",
+                headers: {
+                    "x-access-token": cookies.get('access_token')
+                },
+            });
+        }
+        catch (ex) {
+            message.error("Can't read page")
+            return;
+        }
+    }
+
     const cols_new = [];
     for (let i = 0; i < datas.length; i++) {
         cols_new.push(
-            <Col key={i.toString()}>
-                <div>
-                    <Card title={datas[i].title} hoverable style={{ width: 350 }} cover={<img alt="thumnail" src={datas[i].thumbnailUrl}/>} onClick={()=>window.open(`${datas[i].url}`)}>
-                        <Meta title={datas[i].title} description={datas[i].url}></Meta> 
-                    </Card>
-                </div>
-            </Col>,
+            <div key={i.toString()}>
+                <Row>
+                    <Col >
+                        <Button type='default'>★</Button>
+                    </Col>
+                    <Col>
+                        <Button type='default' onClick={()=>deletePage(datas[i].id)}>X</Button>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <div>
+                            <Card title={datas[i].title} hoverable cover={<img alt="thumnail" src={datas[i].thumbnailUrl}/>} style={ datas[i].isRead===true ? {background: "orange", width: 350} : {background: "white", width: 350}} onClick={()=>openPage(datas[i].id, datas[i].url)}>
+                                <Meta title={datas[i].title} description={datas[i].url}></Meta> 
+                            </Card>
+                        </div>
+                    </Col>,
+                </Row>
+            </div>
         );
     }
 
