@@ -289,7 +289,7 @@ export class APIServer
         }
     }
 
-    // PUT: /api/page/read/:id (Not implemented)
+    // PUT: /api/page/read/:id
     async markPageAsRead(ctx, next)
     {
         const params = ctx.request.body;
@@ -300,7 +300,7 @@ export class APIServer
         }
 
         try {
-            await this.core.readPage(ctx.params.id, setUnread);
+            await this.core.readPage(ctx.state.userId, ctx.params.id, setUnread);
 
             ctx.status = 204;
         } catch(e) {

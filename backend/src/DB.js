@@ -18,6 +18,12 @@ function toCamelCase(dbRes)
     return res;
 }
 
+function boolToInt(b)
+{
+    if(b) return 1;
+    return 0;
+}
+
 class DB
 {
     async init(fileName, useVerbose = false)
@@ -42,7 +48,7 @@ class DB
         // TODO: DB schema 수정되면 수정하기
 
         await Promise.all([
-            this.db.exec("CREATE TABLE IF NOT EXISTS user_info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, password TEXT)"),
+            this.db.exec("CREATE TABLE IF NOT EXISTS user_info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, password TEXT)"),
             this.db.exec("CREATE TABLE IF NOT EXISTS web_site_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, crawl_url TEXT, css_selector TEXT, last_url TEXT, owner_user_id INTEGER)"),
             this.db.exec("CREATE TABLE IF NOT EXISTS web_page_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, thumbnail_url TEXT, desc TEXT, time TEXT, is_read INTEGER, site_id INTEGER, owner_user_id INTEGER)")
         ]);
@@ -61,9 +67,16 @@ class DB
 
     async insertUserInfo(userInfo)
     {
-        // TODO: name 중복 안 되게
-        const res = await this.db.run(SQL`INSERT INTO user_info (name, password) VALUES (${userInfo.name}, ${userInfo.password})`);
-        return res.lastID;
+        try {
+            const res = await this.db.run(SQL`INSERT INTO user_info (name, password) VALUES (${userInfo.name}, ${userInfo.password})`);
+            return res.lastID;
+        } catch(e) {
+            if(e.code === "SQLITE_CONSTRAINT") {
+                return -1; // name already existed
+            } else {
+                throw e;
+            }
+        }
     }
 
     async deleteUserInfo(id)
@@ -169,6 +182,7 @@ class DB
         if(params.count) {
             query.append(SQL` LIMIT ${params.count}`);
         }
+        query.append(SQL` ORDER BY id DESC`);
 
         const res = await this.db.all(query);
         return res.map(function(e){ return toCamelCase(e) });
@@ -190,7 +204,7 @@ class DB
     {
         const query = SQL`INSERT INTO web_page_info (title, url, thumbnail_url, desc, time, is_read, site_id, owner_user_id) `;
         query.append(SQL`VALUES (${webPageInfo.title}, ${webPageInfo.url}, ${webPageInfo.thumbnailUrl}, ${webPageInfo.desc},
-                                 ${webPageInfo.time.toISOString()}, ${webPageInfo.isRead}, ${webPageInfo.siteId}, ${webPageInfo.ownerUserId})`);
+                                 ${webPageInfo.time.toISOString()}, ${boolToInt(webPageInfo.isRead)}, ${webPageInfo.siteId}, ${webPageInfo.ownerUserId})`);
 
         const res = await this.db.run(query);
         return res.lastID;
@@ -215,7 +229,7 @@ class DB
         if(params.thumbnailUrl !== undefined) paramString.push(`thumbnail_url="${params.thumbnailUrl}"`);
         if(params.desc !== undefined) paramString.push(`desc="${params.desc}"`);
         if(params.time !== undefined) paramString.push(`time="${params.time.toISOString()}"`);
-        if(params.isRead !== undefined) paramString.push(`is_read=${params.isRead}`);
+        if(params.isRead !== undefined) paramString.push(`is_read=${boolToInt(params.isRead)}`);
         if(params.siteId !== undefined) paramString.push(`site_id=${params.siteId}`);
         if(params.ownerUserId !== undefined) paramString.push(`owner_user_id=${params.ownerUserId}`);
 
