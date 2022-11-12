@@ -183,18 +183,13 @@ export class Core
         }
     }
 
-    async readPage(id, setUnread)
+    async readPage(userId, id, setUnread)
     {
-        if(setUnread == false) {
-            const res = await DB.updatePage(id, { isRead: true });
-            if(res == 0) {
-                throw new PageNotFoundError(id);
-            }
-        } else {
-            const res = await DB.updatePage(id, { isRead: false });
-            if(res == 0) {
-                throw new PageNotFoundError(id);
-            }
+        const res = await DB.updatePage(userId, id, { isRead: !setUnread });
+        if(res == 0) {
+            throw new InvalidRequestError("Page not found", 404);
+        } else if(res == -1) {
+            // Do nothing
         }
     }
 

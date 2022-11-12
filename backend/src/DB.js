@@ -18,6 +18,12 @@ function toCamelCase(dbRes)
     return res;
 }
 
+function boolToInt(b)
+{
+    if(b) return 1;
+    return 0;
+}
+
 class DB
 {
     async init(fileName, useVerbose = false)
@@ -190,7 +196,7 @@ class DB
     {
         const query = SQL`INSERT INTO web_page_info (title, url, thumbnail_url, desc, time, is_read, site_id, owner_user_id) `;
         query.append(SQL`VALUES (${webPageInfo.title}, ${webPageInfo.url}, ${webPageInfo.thumbnailUrl}, ${webPageInfo.desc},
-                                 ${webPageInfo.time.toISOString()}, ${webPageInfo.isRead}, ${webPageInfo.siteId}, ${webPageInfo.ownerUserId})`);
+                                 ${webPageInfo.time.toISOString()}, ${boolToInt(webPageInfo.isRead)}, ${webPageInfo.siteId}, ${webPageInfo.ownerUserId})`);
 
         const res = await this.db.run(query);
         return res.lastID;
@@ -215,7 +221,7 @@ class DB
         if(params.thumbnailUrl !== undefined) paramString.push(`thumbnail_url="${params.thumbnailUrl}"`);
         if(params.desc !== undefined) paramString.push(`desc="${params.desc}"`);
         if(params.time !== undefined) paramString.push(`time="${params.time.toISOString()}"`);
-        if(params.isRead !== undefined) paramString.push(`is_read=${params.isRead}`);
+        if(params.isRead !== undefined) paramString.push(`is_read=${boolToInt(params.isRead)}`);
         if(params.siteId !== undefined) paramString.push(`site_id=${params.siteId}`);
         if(params.ownerUserId !== undefined) paramString.push(`owner_user_id=${params.ownerUserId}`);
 
