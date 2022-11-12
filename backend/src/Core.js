@@ -39,7 +39,16 @@ export class Core
     // Register 
     async register(userInfo)
     {
-        return await DB.insertUserInfo(userInfo);
+        const userId = await DB.getUserInfo(userInfo.name);
+        if(userId !== undefined) {
+            throw new InvalidRequestError("ID already existed", 400);
+        }
+
+        const res = await DB.insertUserInfo(userInfo);
+        if(res == -1) {
+            throw new InvalidRequestError("ID already existed", 400);
+        }
+        return res;
     }
 
     async checkRegistered(userInfo)

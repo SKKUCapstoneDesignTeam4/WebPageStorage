@@ -48,7 +48,7 @@ class DB
         // TODO: DB schema 수정되면 수정하기
 
         await Promise.all([
-            this.db.exec("CREATE TABLE IF NOT EXISTS user_info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, password TEXT)"),
+            this.db.exec("CREATE TABLE IF NOT EXISTS user_info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, password TEXT)"),
             this.db.exec("CREATE TABLE IF NOT EXISTS web_site_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, crawl_url TEXT, css_selector TEXT, last_url TEXT, owner_user_id INTEGER)"),
             this.db.exec("CREATE TABLE IF NOT EXISTS web_page_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, thumbnail_url TEXT, desc TEXT, time TEXT, is_read INTEGER, site_id INTEGER, owner_user_id INTEGER)")
         ]);
@@ -67,9 +67,16 @@ class DB
 
     async insertUserInfo(userInfo)
     {
-        // TODO: name 중복 안 되게
-        const res = await this.db.run(SQL`INSERT INTO user_info (name, password) VALUES (${userInfo.name}, ${userInfo.password})`);
-        return res.lastID;
+        try {
+            const res = await this.db.run(SQL`INSERT INTO user_info (name, password) VALUES (${userInfo.name}, ${userInfo.password})`);
+            return res.lastID;
+        } catch(e) {
+            if(e.code === "SQLITE_CONSTRAINT") {
+                return -1; // name already existed
+            } else {
+                throw e;
+            }
+        }
     }
 
     async deleteUserInfo(id)
