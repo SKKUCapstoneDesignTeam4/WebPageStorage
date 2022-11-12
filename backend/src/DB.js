@@ -175,6 +175,7 @@ class DB
         if(params.count) {
             query.append(SQL` LIMIT ${params.count}`);
         }
+        query.append(SQL` ORDER BY id DESC`);
 
         const res = await this.db.all(query);
         return res.map(function(e){ return toCamelCase(e) });
