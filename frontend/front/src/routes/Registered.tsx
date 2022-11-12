@@ -64,6 +64,9 @@ export default function Registered() {
                 headers: {
                     "x-access-token": cookies.get('access_token')
                 },
+                data:{
+                    deleteAllPages: true
+                }
             });
             getSites();
 
