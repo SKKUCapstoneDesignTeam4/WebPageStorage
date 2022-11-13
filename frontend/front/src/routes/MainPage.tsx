@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Breadcrumb, Button, Card, Layout, Row, Col, message } from 'antd';
 import {
@@ -27,12 +27,48 @@ interface DataType {
     url: string;
 }
 
+const PAGE_BLOCK_SIZE = 5;
+
+
 export default function MainPage() {
     const [collapsed, setCollapsed] = useState(false);
     const [datas, setDatas] = useState<DataType[]>([]);
+    //const datas = useRef<DataType[]>();
+    const countPageLoaded = useRef(PAGE_BLOCK_SIZE);
 
 
-    const getPages = async () => {
+    const [bottom, setBottom] = useState<HTMLDivElement | null>(null);
+    const bottomObserver = useRef<IntersectionObserver>();
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            entries => {
+                if (entries[0].isIntersecting){
+                    console.log(countPageLoaded.current);
+                    countPageLoaded.current +=  PAGE_BLOCK_SIZE;
+                    getPages(countPageLoaded.current);
+                }
+            },
+            { threshold: 0.25, rootMargin: '80px' }
+        );
+        bottomObserver.current = observer;
+    }, []);
+
+    useEffect(() => {
+        const observer = bottomObserver.current;
+        if(observer == undefined)
+            return;
+        if(bottom){
+            observer.observe(bottom);
+            return () => {
+                if(bottom) {
+                    observer.unobserve(bottom);
+                }
+            };
+        }
+    },[bottom]);
+
+    const getPages = async (count : number) => {
         try {
             const response = await axios({
                 url: "http://localhost:4000/api/pages",
@@ -40,17 +76,21 @@ export default function MainPage() {
                 headers: {
                     "x-access-token": cookies.get('access_token')
                 },
+                params : {
+                    count: count,
+                }
             });
+
             setDatas(response.data);
         }
         catch (ex) {
-            message.error("Can't get ages")
+            message.error("Can't get pages")
             return;
         }
     }
 
     useEffect(() => {
-        getPages();
+        getPages(PAGE_BLOCK_SIZE);
     },[]);
 
 
@@ -63,7 +103,7 @@ export default function MainPage() {
                     "x-access-token": cookies.get('access_token')
                 },
             });
-            getPages();
+            getPages(PAGE_BLOCK_SIZE);
         }
         catch (ex) {
             message.error("Can't delete page")
@@ -157,6 +197,8 @@ export default function MainPage() {
                     </Row>
                 </Content>
             </Layout>
+            <div ref={setBottom} />
+
         </Layout>
     );
 }
