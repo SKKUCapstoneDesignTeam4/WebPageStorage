@@ -177,12 +177,12 @@ class DB
     {
         const query = SQL`SELECT * FROM web_page_info WHERE owner_user_id=${userId}`;
         if(params.afterId) {
-            query.append(SQL` AND id < ${afterId}`);
+            query.append(SQL` AND id < ${params.afterId}`);
         }
+        query.append(SQL` ORDER BY id DESC`);
         if(params.count) {
             query.append(SQL` LIMIT ${params.count}`);
         }
-        query.append(SQL` ORDER BY id DESC`);
 
         const res = await this.db.all(query);
         return res.map(function(e){ return toCamelCase(e) });
