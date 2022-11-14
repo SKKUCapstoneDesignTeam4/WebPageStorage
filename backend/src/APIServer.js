@@ -150,6 +150,8 @@ export class APIServer
         router.put("/api/site/:id", this.updateSite.bind(this));
         router.delete("/api/site/:id", this.removeSite.bind(this));
 
+        router.post("/api/dev/force", this.forceRefresh.bind(this));
+
         this.koaApp.use(router.routes());
         this.koaApp.use(router.allowedMethods());
     }
@@ -375,6 +377,14 @@ export class APIServer
             e.message += `\n        Request parameters: ${JSON.stringify(params)}`;
             throw e;
         }
+    }
+
+    // POST: /api/dev/force
+    async forceRefresh(ctx, next)
+    {
+        this.core.forceRefresh();
+
+        ctx.status = 204;
     }
 
     // ===================

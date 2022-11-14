@@ -202,6 +202,13 @@ export class Core
         }
     }
 
+    forceRefresh()
+    {
+        this.watchers.forEach((w) => {
+            w.checkImmediately();
+        });
+    }
+
     //==============================================
 
     async verifySite(webSiteInfo)
