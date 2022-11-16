@@ -144,7 +144,7 @@ export default function MainPage() {
                 <Row>
                     <Col>
                         <div>
-                            <Card title={datas[i].title} hoverable cover={<img alt="thumnail" src={datas[i].thumbnailUrl}/>} style={ datas[i].isRead===true ? {background: "orange", width: 350} : {background: "white", width: 350}} onClick={()=>openPage(datas[i].id, datas[i].url)}>
+                            <Card title={datas[i].title} hoverable cover={<img alt="thumnail" src={"http://localhost:4000/" + datas[i].thumbnailUrl}/>} style={ datas[i].isRead===true ? {background: "orange", width: 350} : {background: "white", width: 350}} onClick={()=>openPage(datas[i].id, datas[i].url)}>
                                 <Meta title={datas[i].title} description={datas[i].url}></Meta> 
                             </Card>
                         </div>
