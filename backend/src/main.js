@@ -22,9 +22,6 @@ const run = async function(){
     {
         await DB.init("db.db", true);
 
-        // await DB.insertUserInfo({ name:"T3", password:"P3" });
-        // await DB.deleteUserInfo(2);
-
         await core.initialize();
         core.run();
 

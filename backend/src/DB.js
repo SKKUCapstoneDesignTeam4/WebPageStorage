@@ -45,13 +45,25 @@ class DB
 
     async initDBSchema()
     {
-        // TODO: DB schema 수정되면 수정하기
-
         await Promise.all([
             this.db.exec("CREATE TABLE IF NOT EXISTS user_info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, password TEXT)"),
             this.db.exec("CREATE TABLE IF NOT EXISTS web_site_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, crawl_url TEXT, css_selector TEXT, last_url TEXT, owner_user_id INTEGER)"),
-            this.db.exec("CREATE TABLE IF NOT EXISTS web_page_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, thumbnail_url TEXT, desc TEXT, time TEXT, is_read INTEGER, site_id INTEGER, owner_user_id INTEGER)")
+            this.db.exec("CREATE TABLE IF NOT EXISTS web_page_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, thumbnail_url TEXT, desc TEXT, time TEXT, is_read INTEGER, site_id INTEGER, owner_user_id INTEGER)"),
+            this.db.exec("CREATE TABLE IF NOT EXISTS web_page_body_info (id INTEGER PRIMARY KEY AUTOINCREMENT, page_id INTEGER, time TEXT, body TEXT)")
         ]);
+
+        // Add additional column
+        {
+            // web_page_info
+            const columnInfos = await this.db.all(`PRAGMA table_info(web_page_info)`);
+
+            if(columnInfos.find((e) => e.name === "is_updated") === undefined) {
+                await this.db.exec("ALTER TABLE web_page_info ADD COLUMN is_updated DEFAULT 0");
+            }
+            if(columnInfos.find((e) => e.name === "is_deleted") === undefined) {
+                await this.db.exec("ALTER TABLE web_page_info ADD COLUMN is_deleted DEFAULT 0");
+            }
+        }
     }
 
     async shutdown()
