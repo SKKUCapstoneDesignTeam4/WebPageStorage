@@ -74,8 +74,8 @@ export async function getPageInfo(pageUrl)
         url: url,
         thumbnailUrl: thumbnailUrl,
         desc: desc,
-        time: moment().toDate(),
-        isRead: false,
+        time: moment().toDate().toISOString(),
+        isRead: 0,
         siteId: "",
         OwnerUserId: ""
     };

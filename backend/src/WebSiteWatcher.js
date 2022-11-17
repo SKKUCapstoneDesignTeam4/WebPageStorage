@@ -1,7 +1,6 @@
 import * as cheerio from "cheerio";
 import axios from "axios";
 import * as utility from "./Utility.js"
-import moment from "moment"
 
 import { logger } from "./Logger.js";
 
@@ -33,6 +32,10 @@ export class WebSiteWatcher
 
     checkImmediately()
     {
+        if(this.intervalId) {
+            clearTimeout(this.intervalId);
+        }
+
         this._runInternal();
 
         const nextTimeSec = 3600; // 1 hour

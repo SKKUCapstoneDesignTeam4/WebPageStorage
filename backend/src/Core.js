@@ -6,12 +6,14 @@ import sharp from "sharp";
 import { DB } from "./DB.js";
 import { logger } from "./Logger.js";
 import { WebSiteWatcher } from "./WebSiteWatcher.js";
+import { WebPageWatcher } from "./WebPageWatcher.js";
 import { rimrafPromise, relToAbsUrl } from "./Utility.js";
 import { InvalidRequestError } from "./Error.js";
 
 export class Core
 {
     watchers = []
+    pageWatchers = []
 
     constructor()
     {
@@ -25,15 +27,23 @@ export class Core
         infos.forEach((info) => {
             this.watchers.push(new WebSiteWatcher(this, info));
         });
+
+        const pages = await DB.getPages(-1);
+        pages.forEach((page) => {
+            this.pageWatchers.push(new WebPageWatcher(this, page));
+        })
     }
 
     run()
     {
         this.watchers.forEach(function(w){
             w.start();
-        })
+        });
+        this.pageWatchers.forEach(function(w){
+            w.start();
+        });
 
-        logger.info(`Started Core. (Num of watchers : ${this.watchers.length})`);
+        logger.info(`Started Core.\n      (Num of watchers: ${this.watchers.length} / Num of page watchers: ${this.pageWatchers.length})`);
     }
 
     // Register 
@@ -88,8 +98,6 @@ export class Core
             this.watchers.push(watcher);
 
             logger.info(`Core: Inserted a web site.\n        id: ${info.id} / title: ${info.title} / url: ${info.url}`);
-
-            watcher.checkImmediately();
         }
         catch(e){
             throw e;
@@ -168,6 +176,10 @@ export class Core
             DB.updateWebSite(info.ownerUserId, info.siteId, { lastUrl: info.url })
         ]);
 
+        const watcher = new WebPageWatcher(this, info);
+        watcher.start();
+        this.pageWatchers.push(watcher);
+
         logger.info(`Core: Added a new page. (Site id: ${info.siteId})\n        id: ${info.id} / title: ${info.title}`);
     }
 
@@ -188,13 +200,24 @@ export class Core
         }
 
         if(res > 0) {
+            const index = this.pageWatchers.findIndex(function(e) {
+                return e.getPageId() == id;
+            });
+
+            if(index == -1) {
+                logger.warn(`Core: Cannot find the page in page wachter.\n        id: ${id}\n`);
+            } else {
+                this.pageWatchers[idx].stop();
+                this.pageWatchers.splice(index, 1);
+            }
+
             logger.info(`Core: Deleted the page.\n        id: ${id}`);
         }
     }
 
     async readPage(userId, id, setUnread)
     {
-        const res = await DB.updatePage(userId, id, { isRead: !setUnread });
+        const res = await DB.updatePage(userId, id, { isRead: setUnread ? 0 : 1 });
         if(res == 0) {
             throw new InvalidRequestError("Page not found", 404);
         } else if(res == -1) {
@@ -202,9 +225,40 @@ export class Core
         }
     }
 
+    async updatePage(userId, id, params)
+    {
+        const res = await DB.updatePage(userId, id, params);
+
+        if(res > 0) {
+            const index = this.pageWatchers.findIndex(function(e) {
+                return e.getPageId() == id;
+            });
+
+            if(index == -1) {
+                logger.warn(`Core: Cannot find web page in the page watchers.\n        Page id: ${id}`)
+            } else {
+                this.pageWatchers[index].stop();
+                this.watchers.splice(index, 1);
+
+                const updatedInfo = await DB.getPage(userId, id);
+                const wathcer = new WebPageWatcher(this, updatedInfo);
+                wathcer.start();
+                this.pageWatchers.push(wathcer);
+
+            }
+
+            logger.info(`Core: Web page is updated.\n        id: ${id} / params: ${JSON.stringify(params)}`);
+        } else {
+            logger.warn(`Core: Try to update the web page, but nothing changed.\n        id: ${id} / params: ${JSON.stringify(params)}`);
+        }
+    }
+
     forceRefresh()
     {
         this.watchers.forEach((w) => {
+            w.checkImmediately();
+        });
+        this.pageWatchers.forEach((w) => {
             w.checkImmediately();
         });
     }

@@ -18,12 +18,6 @@ function toCamelCase(dbRes)
     return res;
 }
 
-function boolToInt(b)
-{
-    if(b) return 1;
-    return 0;
-}
-
 class DB
 {
     async init(fileName, useVerbose = false)
@@ -115,7 +109,7 @@ class DB
 
     async getWebSites(userId)
     {
-        const query = SQL`SELECT * FROM web_site_info`;
+        let query = SQL`SELECT * FROM web_site_info`;
         if(userId != -1) query.append(SQL` WHERE owner_user_id=${userId}`);
 
         const res = await this.db.all(query);
@@ -125,7 +119,7 @@ class DB
 
     async getWebSite(userId, id)
     {
-        const query = SQL`SELECT * from web_site_info WHERE id=${id}`;
+        let query = SQL`SELECT * from web_site_info WHERE id=${id}`;
         if(userId != -1) query.append(SQL` AND owner_user_id=${userId}`);
         const res = await this.db.get(query);
 
@@ -134,7 +128,7 @@ class DB
 
     async insertWebSite(webSiteInfo)
     {
-        const query = SQL`INSERT INTO web_site_info (title, url, crawl_url, css_selector, last_url, owner_user_id) `;
+        let query = SQL`INSERT INTO web_site_info (title, url, crawl_url, css_selector, last_url, owner_user_id) `;
         query.append(SQL`VALUES (${webSiteInfo.title}, ${webSiteInfo.url}, ${webSiteInfo.crawlUrl}, ${webSiteInfo.cssSelector},
                                  ${webSiteInfo.lastUrl}, ${webSiteInfo.ownerUserId})`);
 
@@ -144,12 +138,12 @@ class DB
 
     async deleteWebSite(userId, id, deleteAllPages = false)
     {
-        const query = SQL`DELETE FROM web_site_info WHERE id=${id}`;
+        let query = SQL`DELETE FROM web_site_info WHERE id=${id}`;
         if(userId != -1) query.append(SQL` AND owner_user_id=${userId}`);
         const res = await this.db.run(query);
 
         if(deleteAllPages) {
-            const query2 = SQL`DELETE FROM web_page_info WHERE site_id=${id}`;
+            let query2 = SQL`DELETE FROM web_page_info WHERE site_id=${id}`;
             if(userId != -1) query2.append(SQL` AND owner_user_id=${userId}`);
             await this.db.run(query2);
         }
@@ -170,7 +164,7 @@ class DB
         if(params.ownerUserId !== undefined) paramString.push(`owner_user_id=${params.ownerUserId}`);
 
         if(paramString.length > 0) {
-            const query = SQL`UPDATE web_site_info SET `
+            let query = SQL`UPDATE web_site_info SET `
                              .append(paramString.join(","))
                              .append(SQL` WHERE id=${id}`);
             if(userId != -1) query.append(SQL` AND owner_user_id=${userId}`);
@@ -187,13 +181,17 @@ class DB
     //   * count
     async getPages(userId, params)
     {
-        const query = SQL`SELECT * FROM web_page_info WHERE owner_user_id=${userId}`;
-        if(params.afterId) {
-            query.append(SQL` AND id < ${params.afterId}`);
-        }
-        query.append(SQL` ORDER BY id DESC`);
-        if(params.count) {
-            query.append(SQL` LIMIT ${params.count}`);
+        let query = SQL`SELECT * FROM web_page_info WHERE owner_user_id=${userId}`;
+        if(userId == -1) {
+            query = SQL`SELECT * FROM web_page_info`;
+        } else {
+            if(params.afterId) {
+                query.append(SQL` AND id < ${params.afterId}`);
+            }
+            query.append(SQL` ORDER BY id DESC`);
+            if(params.count) {
+                query.append(SQL` LIMIT ${params.count}`);
+            }
         }
 
         const res = await this.db.all(query);
@@ -202,7 +200,7 @@ class DB
 
     async getPage(userId, id)
     {
-        const query = SQL`SELECT * from web_page_info WHERE id=${id}`;
+        let query = SQL`SELECT * from web_page_info WHERE id=${id}`;
         if(userId != -1) query.append(SQL` AND owner_user_id=${userId}`);
         const res = await this.db.get(query);
 
@@ -214,9 +212,9 @@ class DB
 
     async insertPage(webPageInfo)
     {
-        const query = SQL`INSERT INTO web_page_info (title, url, thumbnail_url, desc, time, is_read, site_id, owner_user_id) `;
+        let query = SQL`INSERT INTO web_page_info (title, url, thumbnail_url, desc, time, is_read, site_id, owner_user_id) `;
         query.append(SQL`VALUES (${webPageInfo.title}, ${webPageInfo.url}, ${webPageInfo.thumbnailUrl}, ${webPageInfo.desc},
-                                 ${webPageInfo.time.toISOString()}, ${boolToInt(webPageInfo.isRead)}, ${webPageInfo.siteId}, ${webPageInfo.ownerUserId})`);
+                                 ${webPageInfo.time}, ${webPageInfo.isRead}, ${webPageInfo.siteId}, ${webPageInfo.ownerUserId})`);
 
         const res = await this.db.run(query);
         return res.lastID;
@@ -224,7 +222,7 @@ class DB
 
     async deletePage(userId, id)
     {
-        const query = SQL`DELETE FROM web_page_info WHERE id=${id}`;
+        let query = SQL`DELETE FROM web_page_info WHERE id=${id}`;
         if(userId != -1) query.append(SQL` AND owner_user_id=${userId}`);
 
         const res = await this.db.run(query);
@@ -240,13 +238,15 @@ class DB
         if(params.url !== undefined) paramString.push(`url="${params.url}"`);
         if(params.thumbnailUrl !== undefined) paramString.push(`thumbnail_url="${params.thumbnailUrl}"`);
         if(params.desc !== undefined) paramString.push(`desc="${params.desc}"`);
-        if(params.time !== undefined) paramString.push(`time="${params.time.toISOString()}"`);
-        if(params.isRead !== undefined) paramString.push(`is_read=${boolToInt(params.isRead)}`);
+        if(params.time !== undefined) paramString.push(`time="${params.time}"`);
+        if(params.isRead !== undefined) paramString.push(`is_read=${params.isRead}`);
         if(params.siteId !== undefined) paramString.push(`site_id=${params.siteId}`);
         if(params.ownerUserId !== undefined) paramString.push(`owner_user_id=${params.ownerUserId}`);
+        if(params.isUpdated !== undefined) paramString.push(`is_updated=${params.isUpdated}`);
+        if(params.isDeleted !== undefined) paramString.push(`is_deleted=${params.isDeleted}`);
 
         if(paramString.length > 0) {
-            const query = SQL`UPDATE web_page_info SET `
+            let query = SQL`UPDATE web_page_info SET `
                           .append(paramString.join(","))
                           .append(SQL` WHERE id=${id}`);
             if(userId != -1) query.append(SQL` AND owner_user_id=${userId}`);
