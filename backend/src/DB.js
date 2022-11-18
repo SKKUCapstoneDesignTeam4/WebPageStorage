@@ -280,6 +280,14 @@ class DB
         const res = await this.db.run(query);
         return res.changes;
     }
+
+    async deleteAllPageBody(pageId)
+    {
+        let query = SQL`DELETE FROM web_page_body_info WHERE page_id=${pageId}`;
+
+        const res = await this.db.run(query);
+        return res.changes;
+    }
 }
 
 const db = new DB()

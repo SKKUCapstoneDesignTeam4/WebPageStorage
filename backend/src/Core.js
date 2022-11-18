@@ -211,6 +211,8 @@ export class Core
                 this.pageWatchers.splice(index, 1);
             }
 
+            await DB.deleteAllPageBody(id);
+
             logger.info(`Core: Deleted the page.\n        id: ${id}`);
         }
     }
