@@ -204,9 +204,6 @@ class DB
         if(userId != -1) query.append(SQL` AND owner_user_id=${userId}`);
         const res = await this.db.get(query);
 
-        // time만 Date타입으로 바꿔줌
-        res.time = Date.parse(res.time);
-
         return toCamelCase(res);
     }
 
@@ -256,6 +253,32 @@ class DB
         } else {
             return -1;
         }
+    }
+
+    async getLastPageBody(pageId)
+    {
+        let query = SQL`SELECT * from web_page_body_info WHERE page_id=${pageId}`;
+        query.append(SQL` ORDER BY id DESC LIMIT 1`);
+        const res = await this.db.get(query);
+
+        return toCamelCase(res);
+    }
+
+    async insertPageBody(pageBodyInfo)
+    {
+        let query = SQL`INSERT INTO web_page_body_info (page_id, time, body) `;
+        query.append(SQL`VALUES (${pageBodyInfo.pageId}, ${pageBodyInfo.time}, ${pageBodyInfo.body})`);
+
+        const res = await this.db.run(query);
+        return res.lastID;
+    }
+
+    async deletePageBody(id)
+    {
+        let query = SQL`DELETE FROM web_page_body_info WHERE id=${id}`;
+
+        const res = await this.db.run(query);
+        return res.changes;
     }
 }
 
