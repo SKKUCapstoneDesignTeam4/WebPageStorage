@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Breadcrumb, Button, Card, Layout, Row, Col, message } from 'antd';
+import moment from 'moment'
+import { Breadcrumb, Button, Card, Layout, Row, Col, message, Tag } from 'antd';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -18,7 +18,7 @@ const {Meta} = Card;
 interface DataType {
     desc: string;
     id: string;
-    isRead: boolean;
+    isRead: number;
     ownerUserId: string;
     siteId: string;
     thumbnailUrl: string;
@@ -130,11 +130,12 @@ export default function StoredPages() {
     }
 
     const cols_new = [];
+    var yesterday = moment().subtract(1,'days').format('YYYY-MM-DD');
     for (let i = 0; i < datas.length; i++) {
         cols_new.push(
             <div key={i.toString()}>
                 <Row>
-                    <Col>
+                    <Col offset={18}>
                         <Button type='default'>★</Button>
                     </Col>
                     <Col>
@@ -144,7 +145,12 @@ export default function StoredPages() {
                 <Row>
                     <Col>
                         <div>
-                            <Card title={datas[i].title} hoverable cover={<img alt="thumnail" src={"http://localhost:4000/" + datas[i].thumbnailUrl}/>} style={ datas[i].isRead===true ? {background: "orange", width: 350} : {background: "white", width: 350}} onClick={()=>openPage(datas[i].id, datas[i].url)}>
+                            <Card title={datas[i].title} 
+                            hoverable 
+                            cover={ datas[i].thumbnailUrl === "" ? <img alt="thumnail" src={"http://localhost:4000/" + datas[i].thumbnailUrl}/> : ""} 
+                            style={ datas[i].isRead===0 ? {borderColor: "red", width: 350 } : {width: 350}} 
+                            onClick={()=>openPage(datas[i].id, datas[i].url)}
+                            extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
                                 <Meta description={datas[i].url}></Meta> 
                             </Card>
                         </div>
