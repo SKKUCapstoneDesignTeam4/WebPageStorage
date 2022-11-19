@@ -83,7 +83,7 @@ export function Login(){
         if(response.status === 200){
             const token = response.data.token;
             cookies.set('access_token', token, {sameSite: 'strict'});
-            navigate('/Main');
+            navigate('/StoredPages');
         }
         } catch(ex){
             message.error('Wrong ID or PW');

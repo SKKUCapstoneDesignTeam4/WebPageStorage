@@ -6,12 +6,12 @@ import {
     MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import SideMenu from '../components/SideMenu';
-import './MainPage.css';
+import './Bookmark.css';
 
 const { Header, Content, Sider, } = Layout;
 
 
-export default function NewPages(){
+export default function Bookmark(){
 
     const [collapsed, setCollapsed] = useState(false);
     const cols_new = [];
@@ -52,7 +52,7 @@ export default function NewPages(){
                 <Content style={{ margin: '0 16px' }}>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                         <Breadcrumb.Item className='Category-title'>
-                            New
+                            Bookmark
                         </Breadcrumb.Item>
                         
                     </Breadcrumb>
