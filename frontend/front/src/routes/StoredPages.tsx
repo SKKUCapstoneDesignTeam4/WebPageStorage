@@ -131,9 +131,10 @@ export default function StoredPages() {
         }
     }
 
-    const openPage = async (id:string, url:string) => {
+    const openPage = async (event: React.MouseEvent<HTMLElement>, id:string, url:string) => {
         window.open(url);
-        
+        event.currentTarget.style.borderColor = "white";
+        // event.target
         try {
             const response = await axios({
                 url: `api/page/read/${id}`,
@@ -141,6 +142,8 @@ export default function StoredPages() {
                 headers: {
                     "x-access-token": cookies.get('access_token')
                 },
+            }).then(()=>{
+                console.log(document.getElementById(id));
             });
         }
         catch (ex) {
@@ -169,7 +172,7 @@ export default function StoredPages() {
                             hoverable 
                             cover={ datas[i].thumbnailUrl === "" ? <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> : ""} 
                             style={ datas[i].isRead===0 ? {borderColor: "red", width: 350 } : {width: 350}} 
-                            onClick={()=>openPage(datas[i].id, datas[i].url)}
+                            onClick={(event: React.MouseEvent<HTMLElement>)=>openPage(event, datas[i].id, datas[i].url)}
                             extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
                                 <Meta description={datas[i].url}></Meta> 
                             </Card>
