@@ -1,190 +1,407 @@
-import React, { useState, useEffect, useRef } from 'react';
-import moment from 'moment'
-import { Breadcrumb, Button, Card, Layout, Row, Col, message, Tag } from 'antd';
+import React, { useEffect, useState } from 'react';
+import './Registered.css';
+import axios from 'axios';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
 } from '@ant-design/icons';
-import SideMenu from '../components/SideMenu';
-import './StoredPages.css';
 
-import axios from 'axios';
+import { Button, Breadcrumb, Input, Layout, Col, Row,Popconfirm, InputNumber, Form, Table, Typography, message } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+
+import SideMenu from '../components/SideMenu';
 import Cookies from "universal-cookie";
+
+// import {EditableTable,DataType} from '../components/RegisterTable';
+
+import { ColumnProps } from "antd/lib/table";
+import "antd/dist/antd.css";
+
+
+const { Header, Content, Sider } = Layout;
+const { Text } = Typography;
 
 const cookies = new Cookies();
 
-const { Header, Content, Sider, } = Layout;
-const {Meta} = Card;
-interface DataType {
-    desc: string;
-    id: string;
-    isRead: number;
-    ownerUserId: string;
-    siteId: string;
-    thumbnailUrl: string;
-    time: string;
-    title: string;
-    url: string;
-}
-
-const PAGE_BLOCK_SIZE = 10;
 
 
-export default function StoredPages() {
+export interface DataType {
+    // [index : string] : string| number;
+    // id: string;
+    key: string;
+    name: string;
+    address: string;
+    Description: string;
+    cssSelector : string;
+  }
+
+  
+// type Props = {
+//     iTableData : DataType[]
+//     Modify(id : string) : Promise<void>,
+//     Delete(id : string) : Promise<void>
+// }
+// function EditableTable ({iTableData, Modify, Delete} : Props)  {
+//     const [tableData, setTableData] = useState<DataType[]>(iTableData);
+//     const [modifyToggle, setModifyToggle] = useState<boolean>(false);
+
+//     useEffect(() => {
+//       setTableData(iTableData);
+//     }, [iTableData]);
+  
+//     const onInputChange = (key : string, index : number) => (
+//       e: React.ChangeEvent<HTMLInputElement>
+//     ) => {
+//     //   const newData = [...tableData];
+//     //   newData[index][key] = Number(e.target.value);
+//       setTableData(iTableData);
+//     };
+    
+//     const ModifyText = (text : string) => {
+//         setModifyToggle(true);
+
+
+//         Modify(text);
+//     }
+//     const columns: ColumnProps<DataType>[] = [
+//       {
+//           title: 'Name',
+//           dataIndex: 'title',
+//           key: 'name',
+//           render: (text, record, index) => (
+//             <Input id="" value={text} onChange={onInputChange("name", index)} readOnly={true} />
+//           )
+//       },
+//       {
+//           title: 'Address',
+//           dataIndex: 'url',
+//           key: 'address',
+//           render: (text, record, index) => (
+//             <Input value={text} onChange={onInputChange("address", index)} readOnly={true} />
+//           )
+//       },
+//       {
+//           title: 'Description',
+//           dataIndex: 'description',
+//           key: 'description',
+//           render: (text, record, index) => (
+//             <Input value={text} onChange={onInputChange("Description", index)} readOnly={true}  />
+//           )
+//       },
+//       {
+//           title: 'operation',
+//           dataIndex: 'id',
+//           render: (text) => (
+//               <div>
+//                   <Button onClick={(e : React.MouseEvent<HTMLButtonElement>) => {
+//                     if(modifyToggle == false)
+//                     {
+//                         e.currentTarget.value = "Apply";
+//                         console.log(e.currentTarget.parentElement);
+//                     }
+//                     else
+//                     {
+//                         e.currentTarget.value = "Modify";
+//                         Modify(text)
+//                     }
+//                   }}>modify</Button>
+//                   <Button onClick={() => Delete(text)}>delete</Button>
+//               </div>
+//           )
+//       },
+//     ];
+  
+//     return (
+//       <div style={{ padding: 20 }}>
+//         <Table
+//           rowKey="id"
+//           columns={columns}
+//           dataSource={tableData}
+//           pagination={false}
+//         />
+  
+//       </div>
+//     );
+//   };
+
+
+
+interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
+    editing: boolean;
+    dataIndex: string;
+    title: any;
+    inputType: 'number' | 'text';
+    record: DataType;
+    index: number;
+    children: React.ReactNode;
+  }
+  
+  const EditableCell: React.FC<EditableCellProps> = ({
+    editing,
+    dataIndex,
+    title,
+    inputType,
+    record,
+    index,
+    children,
+    ...restProps
+  }) => {
+    const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+  
+    return (
+      <td {...restProps}>
+        {editing ? (
+          <Form.Item
+            name={dataIndex}
+            style={{ margin: 0 }}
+            rules={[
+              {
+                required: true,
+                message: `Please Input ${title}!`,
+              },
+            ]}
+          >
+            {inputNode}
+          </Form.Item>
+        ) : (
+          children
+        )}
+      </td>
+    );
+  };
+  
+export default function Registered() {
+
+    const [name, SetName] = React.useState("");
+    const [address, SetAddress] = React.useState("");
+    const [description, SetDescription] = React.useState("");
+    const [css, SetCSS] = React.useState("");
     const [collapsed, setCollapsed] = useState(false);
     const [datas, setDatas] = useState<DataType[]>([]);
-    //const datas = useRef<DataType[]>();
-    const countPageLoaded = useRef(0);
 
+//table
+    const [form] = Form.useForm();
+    const [editingKey, setEditingKey] = useState('');
 
-    const [bottom, setBottom] = useState<HTMLDivElement | null>(null);
-    const bottomObserver = useRef<IntersectionObserver>();
+  const isEditing = (record: DataType) => record.key === editingKey;
 
-    const isPageLoading = useRef<boolean>(false);
+  const edit = (record: Partial<DataType> & { key: React.Key }) => {
+    form.setFieldsValue({ name: '', address: '', description: '', ...record });
+    setEditingKey(record.key);
+  };
 
+  const cancel = () => {
+    setEditingKey('');
+  };
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            entries => {
-                if (!isPageLoading.current && entries[0].isIntersecting){
-                    isPageLoading.current = true;
-                    countPageLoaded.current +=  PAGE_BLOCK_SIZE;
-                    getPages(countPageLoaded.current);
-                }
-            },
-            { threshold: 0.25, rootMargin: '80px' }
-        );
-        bottomObserver.current = observer;
-    }, []);
+  const save = async (id : string, key: React.Key) => {
+    try {
+      const row = (await form.validateFields()) as DataType;
 
-    useEffect(() => {
-        const observer = bottomObserver.current;
-        if(observer == undefined)
-            return;
-        if(bottom){
-            observer.observe(bottom);
-            return () => {
-                if(bottom) {
-                    observer.unobserve(bottom);
-                }
-            };
-        }
-    },[bottom]);
+      const newData = [...datas];
+      const index = newData.findIndex((item) => key === item.key);
+      if (index > -1) {
+        const item = newData[index];
+        newData.splice(index, 1, {
+          ...item,
+          ...row,
+        });
+        setDatas(newData);
+        // handleModify(id,item);
+        setEditingKey('');
+      } else {
+        newData.push(row);
+        setDatas(newData);
+        // handleModify(id,item);
+        setEditingKey('');
+      }
+    } catch (errInfo) {
+      console.log('Validate Failed:', errInfo);
+    }
+  };
 
-    const getPages = async (count : number) => {
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'title',
+      key: 'name',
+    //   width: '25%',
+      editable: true,
+    },
+    {
+      title: 'Address',
+      dataIndex: 'url',
+      key: 'address',
+    //   width: '15%',
+      editable: true,
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+    //   width: '40%',
+      editable: true,
+    },
+    {
+        title: 'CSS Selector',
+        dataIndex: 'cssSelector',
+        key : 'cssSelector',
+        editable: true,
+    },
+    {
+      title: 'operation',
+      dataIndex: 'id',
+      render: (text:string, record: DataType,index:number) => {
+        const editable = isEditing(record);
+        return   <div>
+            {editable ? (
+          <span>
+            <Typography.Link onClick={() => save(text,record.key)} style={{ marginRight: 8 }}>
+              Save
+            </Typography.Link>
+            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+              <a>Cancel</a>
+            </Popconfirm>
+          </span>
+        ) : (
+          <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+            Edit
+          </Typography.Link>
+        ) }
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span>
+            <Typography.Link onClick={() => handleDelete(text)} style={{ marginRight: 8 }}>
+                Delete
+            </Typography.Link>
+        </span>
+        </div>
+      },
+    },
+  ];
+
+  const mergedColumns = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: (record: DataType) => ({
+        record,
+        inputType: col.dataIndex,
+        dataIndex: col.dataIndex,
+        title: col.title,
+        editing: isEditing(record),
+      }),
+    };
+  });
+
+//====
+    
+    const getSites = async () => {
         try {
             const response = await axios({
-                url: "api/pages",
+                url: "api/sites",
                 method: "get",
                 headers: {
                     "x-access-token": cookies.get('access_token')
                 },
-                params : {
-                    count: count,
-                }
             });
-
             setDatas(response.data);
+            console.log(response.data)
         }
         catch (ex) {
-            message.error("Can't get pages")
-            return;
-        }
-        finally{
-            isPageLoading.current = false;
-        }
-    }
-
-
-    
-    useEffect(() => {
-        window.addEventListener('wheel', handleScroll);
-        return () => {
-            window.removeEventListener('wheel', handleScroll); //clean up
-        };
-    }, []);
-    
-    const handleScroll = () => {
-        // 스크롤바가 없을 시 휠을 하면 새 페이지 생성
-        if(!isPageLoading.current && document.body.scrollHeight == document.body.clientHeight)
-        {
-            isPageLoading.current = true;
-            countPageLoaded.current +=  PAGE_BLOCK_SIZE;
-            getPages(countPageLoaded.current);
-        }
-    };
-
-    const deletePage = async (id:string) => {
-        try {
-            const response = await axios({
-                url: `api/page/${id}`,
-                method: "delete",
-                headers: {
-                    "x-access-token": cookies.get('access_token')
-                },
-            });
-            getPages(PAGE_BLOCK_SIZE);
-        }
-        catch (ex) {
-            message.error("Can't delete page")
+            message.error("Can't get sites")
             return;
         }
     }
 
-    const openPage = async (event: React.MouseEvent<HTMLElement>, id:string, url:string) => {
-        window.open(url);
-        event.currentTarget.style.borderColor = "white";
-        // event.target
+    const handleModify = async (id: string, record: DataType) => {
         try {
             const response = await axios({
-                url: `api/page/read/${id}`,
+                url: `api/site/${id}`,
                 method: "put",
                 headers: {
                     "x-access-token": cookies.get('access_token')
                 },
-            }).then(()=>{
-                console.log(document.getElementById(id));
+                data:{
+                    title: record.name,
+                    url: record.address,
+                    crawlUrl: record.address,
+                    cssSelector: record.cssSelector,
+                }
             });
+            getSites();
+
         }
         catch (ex) {
-            message.error("Can't read page")
+            message.error("Can't remove sites");
             return;
         }
     }
 
-    const cols_new = [];
-    var yesterday = moment().subtract(1,'days').format('YYYY-MM-DD');
-    for (let i = 0; i < datas.length; i++) {
-        cols_new.push(
-            <div key={i.toString()}>
-                <Row>
-                    <Col offset={18}>
-                        <Button type='default'>★</Button>
-                    </Col>
-                    <Col>
-                        <Button type='default' onClick={()=>deletePage(datas[i].id)}>X</Button>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <div>
-                            <Card title={datas[i].title} 
-                            hoverable 
-                            cover={ datas[i].thumbnailUrl === "" ? <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> : ""} 
-                            style={ datas[i].isRead===0 ? {borderColor: "red", width: 350 } : {width: 350}} 
-                            onClick={(event: React.MouseEvent<HTMLElement>)=>openPage(event, datas[i].id, datas[i].url)}
-                            extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
-                                <Meta description={datas[i].url}></Meta> 
-                            </Card>
-                        </div>
-                    </Col>,
-                </Row>
-            </div>
-        );
+    const handleDelete = async (id: string) => {
+        try {
+            console.log(id);
+            const response = await axios({
+                url: `api/site/${id}`,
+                method: "delete",
+                headers: {
+                    "x-access-token": cookies.get('access_token')
+                },
+                data:{
+                    deleteAllPages: true
+                }
+            });
+            getSites();
+
+        }
+        catch (ex) {
+            message.error("Can't remove sites");
+            return;
+        }
+    };
+
+
+    const addSite = async () => {
+        if (name === "") {
+            message.error("Please type name");
+            return;
+        }
+        if (address === "") {
+            message.error("Please type address");
+            return;
+        }
+        try {
+            const response = await axios({
+                url: "api/site",
+                method: "post",
+                headers: {
+                    "x-access-token": cookies.get('access_token')
+                },
+                data: {
+                    title: name,
+                    url: address,
+                    crawlUrl: address,
+                    cssSelector: css
+                }
+            });
+            console.log(response.status)
+            getSites()
+        }
+        catch (ex) {
+            message.error("Can't add site");
+            return;
+        }
     }
+
+
+    useEffect(()=>{
+        getSites();
+    },[]);
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
+
             <Header className="site-layout-background" style={{ padding: 0 }}>
                 <Row>
                     <Col>
@@ -204,17 +421,69 @@ export default function StoredPages() {
                 <Content style={{ margin: '0 16px' }}>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                         <Breadcrumb.Item className='Category-title'>
-                                <span>New</span>
+                            Registered Sites
                         </Breadcrumb.Item>
-
                     </Breadcrumb>
-                    <Row gutter={[0, 24]} style={{ minHeight: 520 }}>
-                        {cols_new}
+                    {/* <Table columns={columns} dataSource={datas} /> */}
+                    {/* <EditableTable iTableData={datas} Modify={handleModify} Delete={handleDelete}/> */}
+                    <Form form={form} component={false}>
+                        <Table
+                            components={{
+                            body: {
+                                cell: EditableCell,
+                            },
+                            }}
+                            bordered
+                            dataSource={datas}
+                            columns={mergedColumns}
+                            rowClassName="editable-row"
+                            pagination={{
+                            onChange: cancel,
+                            }}
+                        />
+                    </Form>
+                    <Row justify='center'>
+                        <Col >
+                            <Text strong>New Site</Text>
+                        </Col>
+                        <Col offset={1}>
+                            <Input
+                                id="Name"
+                                placeholder="Name"
+                                value={name}
+                                onChange={({ target: { value } }) => SetName(value)}
+                            />
+                        </Col>
+                        <Col>
+                            <Input
+                                id="Address"
+                                placeholder="Address"
+                                value={address}
+                                onChange={({ target: { value } }) => SetAddress(value)}
+                            />
+                        </Col>
+                        <Col>
+                            <Input
+                                id="Description"
+                                placeholder="Description"
+                                value={description}
+                                onChange={({ target: { value } }) => SetDescription(value)}
+                            />
+                        </Col>
+                        <Col>
+                            <Input
+                                id="CSS"
+                                placeholder="CSS"
+                                value={css}
+                                onChange={({ target: { value } }) => SetCSS(value)}
+                            />
+                        </Col>
+                        <Col>
+                            <Button onClick={addSite}>Add</Button>
+                        </Col>
                     </Row>
                 </Content>
             </Layout>
-            <div ref={setBottom} />
-
         </Layout>
     );
 }
