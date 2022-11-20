@@ -27,24 +27,27 @@ interface DataType {
     url: string;
 }
 
-const PAGE_BLOCK_SIZE = 5;
+const PAGE_BLOCK_SIZE = 10;
 
 
 export default function StoredPages() {
     const [collapsed, setCollapsed] = useState(false);
     const [datas, setDatas] = useState<DataType[]>([]);
     //const datas = useRef<DataType[]>();
-    const countPageLoaded = useRef(PAGE_BLOCK_SIZE);
+    const countPageLoaded = useRef(0);
 
 
     const [bottom, setBottom] = useState<HTMLDivElement | null>(null);
     const bottomObserver = useRef<IntersectionObserver>();
 
+    const isPageLoading = useRef<boolean>(false);
+
+
     useEffect(() => {
         const observer = new IntersectionObserver(
             entries => {
-                if (entries[0].isIntersecting){
-                    console.log(countPageLoaded.current);
+                if (!isPageLoading.current && entries[0].isIntersecting){
+                    isPageLoading.current = true;
                     countPageLoaded.current +=  PAGE_BLOCK_SIZE;
                     getPages(countPageLoaded.current);
                 }
@@ -87,12 +90,29 @@ export default function StoredPages() {
             message.error("Can't get pages")
             return;
         }
+        finally{
+            isPageLoading.current = false;
+        }
     }
 
-    useEffect(() => {
-        getPages(PAGE_BLOCK_SIZE);
-    },[]);
 
+    
+    useEffect(() => {
+        window.addEventListener('wheel', handleScroll);
+        return () => {
+            window.removeEventListener('wheel', handleScroll); //clean up
+        };
+    }, []);
+    
+    const handleScroll = () => {
+        // 스크롤바가 없을 시 휠을 하면 새 페이지 생성
+        if(!isPageLoading.current && document.body.scrollHeight == document.body.clientHeight)
+        {
+            isPageLoading.current = true;
+            countPageLoaded.current +=  PAGE_BLOCK_SIZE;
+            getPages(countPageLoaded.current);
+        }
+    };
 
     const deletePage = async (id:string) => {
         try {
