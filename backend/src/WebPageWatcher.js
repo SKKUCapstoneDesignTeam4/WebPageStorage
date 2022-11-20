@@ -21,7 +21,10 @@ export class WebPageWatcher
 
     start()
     {
-        this.checkImmediately();
+        // Delay checking when initialized
+        // because of preventing checking many pages at same time
+        const delayTimeSec = Math.random() * 3600; // 1 hour
+        this.intervalId = setTimeout(this.checkImmediately.bind(this), delayTimeSec * 1000);
     }
 
     stop()
