@@ -32,7 +32,7 @@ export default function Registered() {
     const getSites = async () => {
         try {
             const response = await axios({
-                url: "http://localhost:4000/api/sites",
+                url: "api/sites",
                 method: "get",
                 headers: {
                     "x-access-token": cookies.get('access_token')
@@ -50,7 +50,7 @@ export default function Registered() {
     const handleDelete = async (id: string) => {
         try {
             const response = await axios({
-                url: `http://localhost:4000/api/site/${id}`,
+                url: `api/site/${id}`,
                 method: "delete",
                 headers: {
                     "x-access-token": cookies.get('access_token')
@@ -112,7 +112,7 @@ export default function Registered() {
         }
         try {
             const response = await axios({
-                url: "http://localhost:4000/api/site",
+                url: "api/site",
                 method: "post",
                 headers: {
                     "x-access-token": cookies.get('access_token')

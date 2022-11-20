@@ -44,7 +44,7 @@ export function Login(){
         }
         try {
             const response = await axios({
-                url: "http://localhost:4000/api/register",
+                url: "api/register",
                 method: "post",
                 data: {
                     id: res_id, password: res_password
@@ -74,7 +74,7 @@ export function Login(){
         
         try{
         const response = await axios({
-            url: "http://localhost:4000/api/auth",
+            url: "api/auth",
             method: "post",
             data: {
                 id: id, password: password

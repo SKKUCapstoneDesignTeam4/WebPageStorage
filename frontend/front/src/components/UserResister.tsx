@@ -28,7 +28,7 @@ export function UserResister() {
         }
         try {
             const response = await axios({
-                url: "http://localhost:4000/api/register",
+                url: "api/register",
                 method: "post",
                 data: {
                     id: id, password: password

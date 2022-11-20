@@ -71,7 +71,7 @@ export default function StoredPages() {
     const getPages = async (count : number) => {
         try {
             const response = await axios({
-                url: "http://localhost:4000/api/pages",
+                url: "api/pages",
                 method: "get",
                 headers: {
                     "x-access-token": cookies.get('access_token')
@@ -97,7 +97,7 @@ export default function StoredPages() {
     const deletePage = async (id:string) => {
         try {
             const response = await axios({
-                url: `http://localhost:4000/api/page/${id}`,
+                url: `api/page/${id}`,
                 method: "delete",
                 headers: {
                     "x-access-token": cookies.get('access_token')
@@ -116,7 +116,7 @@ export default function StoredPages() {
         
         try {
             const response = await axios({
-                url: `http://localhost:4000/api/page/read/${id}`,
+                url: `api/page/read/${id}`,
                 method: "put",
                 headers: {
                     "x-access-token": cookies.get('access_token')
@@ -147,7 +147,7 @@ export default function StoredPages() {
                         <div>
                             <Card title={datas[i].title} 
                             hoverable 
-                            cover={ datas[i].thumbnailUrl === "" ? <img alt="thumnail" src={"http://localhost:4000/" + datas[i].thumbnailUrl}/> : ""} 
+                            cover={ datas[i].thumbnailUrl === "" ? <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> : ""} 
                             style={ datas[i].isRead===0 ? {borderColor: "red", width: 350 } : {width: 350}} 
                             onClick={()=>openPage(datas[i].id, datas[i].url)}
                             extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
