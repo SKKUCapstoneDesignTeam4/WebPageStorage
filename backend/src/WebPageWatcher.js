@@ -69,8 +69,6 @@ export class WebPageWatcher
         let timeGapMin = moment().toDate() - Date.parse(this.pageInfo.time);
         timeGapMin /= 1000 * 60;
 
-        timeGapMin = 0;
-
         if(this.pageInfo.isDeleted === 0 && timeGapMin < 5 * 24 * 60 /*5 days*/) {
             let res = await axios.get(this.pageInfo.url);
             const $ = cheerio.load(res.data);
