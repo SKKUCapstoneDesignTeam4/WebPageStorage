@@ -233,7 +233,7 @@ export default function Registered() {
         try {
             console.log(id,"it is", record.title);
             const response = await axios({
-                url: `api/site/9`,
+                url: `api/site/${id}`,
                 method: "put",
                 headers: {
                     "x-access-token": cookies.get('access_token')
