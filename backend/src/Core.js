@@ -64,7 +64,7 @@ export class Core
     async checkRegistered(userInfo)
     {
         const dbUserInfo = await DB.getUserInfo(userInfo.name);
-        if(userInfo.password === dbUserInfo.password) return dbUserInfo.id;
+        if(dbUserInfo && userInfo.password === dbUserInfo.password) return dbUserInfo.id;
         else return undefined;
     }
 
