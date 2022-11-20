@@ -12,8 +12,6 @@ import type { ColumnsType } from 'antd/es/table';
 import SideMenu from '../components/SideMenu';
 import Cookies from "universal-cookie";
 
-// import {EditableTable,DataType} from '../components/RegisterTable';
-
 import { ColumnProps } from "antd/lib/table";
 import "antd/dist/antd.css";
 
