@@ -6,10 +6,11 @@ import {
     MenuUnfoldOutlined,
 } from '@ant-design/icons';
 
-import { Button, Breadcrumb, Input, Layout, Col, Row, Table, Typography, message } from 'antd';
+import { Button, Breadcrumb, Input, Layout, Col, Row, Table, Typography, Popconfirm } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 import SideMenu from '../components/SideMenu';
+
 import Cookies from "universal-cookie";
 
 const { Header, Content, Sider } = Layout;
@@ -24,15 +25,22 @@ export default function Registered() {
     const [address, SetAddress] = React.useState("");
     const [description, SetDescription] = React.useState("");
     const [css, SetCSS] = React.useState("");
+    const [iserror, SetError] = React.useState(false);
+    const [errorstring, SetErrorString] = React.useState("");
+
     const [collapsed, setCollapsed] = useState(false);
 
 
-    const [datas, setDatas] = useState<DataType[]>([]);
+    const [datas, setDatas] = useState([]);
+
+    function toggleError() {
+        SetError(!iserror);
+    }
 
     const getSites = async () => {
         try {
             const response = await axios({
-                url: "api/sites",
+                url: "http://localhost:4000/api/sites",
                 method: "get",
                 headers: {
                     "x-access-token": cookies.get('access_token')
@@ -42,7 +50,8 @@ export default function Registered() {
 
         }
         catch (ex) {
-            message.error("Can't get sites")
+            SetErrorString("Can't get sites");
+            toggleError();
             return;
         }
     }
@@ -50,23 +59,47 @@ export default function Registered() {
     const handleDelete = async (id: string) => {
         try {
             const response = await axios({
-                url: `api/site/${id}`,
+                url: `http://localhost:4000/api/site/${id}`,
                 method: "delete",
                 headers: {
                     "x-access-token": cookies.get('access_token')
                 },
-                data:{
-                    deleteAllPages: true
-                }
             });
             getSites();
 
         }
         catch (ex) {
-            message.error("Can't remove sites");
+            SetErrorString("Can't remove sites");
+            toggleError();
             return;
         }
     };
+
+    const handleModify = async (id: string) => {
+        try {
+            const response = await axios({
+                url: `http://localhost:4000/api/site/${id}`,
+                method: "put",
+                headers: {
+                    "x-access-token": cookies.get('access_token')
+                },
+                data: {
+                    title: name,
+                    url: address,
+                    crawlUrl: address,
+                    cssSelector: css
+                }
+            });
+            getSites();
+        }
+        catch (ex) {
+            SetErrorString("Can't modify sites");
+            toggleError();
+            return;
+        }
+    };
+
+
 
     interface DataType {
         key: string;
@@ -97,22 +130,33 @@ export default function Registered() {
             render: (text) => (
                 <Button onClick={() => handleDelete(text)}>delete</Button>
             )
+
         },
+        {
+            title: 'operation2',
+            dataIndex: 'id',
+            render: (text) => (
+                <Button onClick={() => handleModify(text)}>modify</Button>
+            )
+
+        }
     ];
 
 
     const addSite = async () => {
         if (name === "") {
-            message.error("Please type name");
+            SetErrorString("Please type name");
+            toggleError();
             return;
         }
         if (address === "") {
-            message.error("Please type address");
+            SetErrorString("Please type address");
+            toggleError();
             return;
         }
         try {
             const response = await axios({
-                url: "api/site",
+                url: "http://localhost:4000/api/site",
                 method: "post",
                 headers: {
                     "x-access-token": cookies.get('access_token')
@@ -128,7 +172,8 @@ export default function Registered() {
             getSites()
         }
         catch (ex) {
-            message.error("Can't add site");
+            SetErrorString("Can't add site");
+            toggleError();
             return;
         }
     }
