@@ -87,6 +87,8 @@ export class WebPageWatcher
             }
 
             if(updated) {
+                await DB.deleteAllPageBody(this.pageInfo.id);
+                
                 Promise.all([
                     DB.insertPageBody({
                         pageId: this.pageInfo.id,
