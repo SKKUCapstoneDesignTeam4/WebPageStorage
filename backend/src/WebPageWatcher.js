@@ -34,13 +34,13 @@ export class WebPageWatcher
         }
     }
 
-    checkImmediately()
+    checkImmediately(skip = false)
     {
         if(this.intervalId) {
             clearTimeout(this.intervalId);
         }
 
-        this._runInternal();
+        if(skip == false) this._runInternal();
 
         const nextTimeSec = 3600; // 1 hour
         this.intervalId = setTimeout(this._runInternal.bind(this), nextTimeSec * 1000);
@@ -87,8 +87,9 @@ export class WebPageWatcher
             }
 
             if(updated) {
-                await DB.deleteAllPageBody(this.pageInfo.id);
-                
+                const res = await DB.deleteAllPageBody(this.pageInfo.id);
+                console.log("# of deleted body: " + res);
+
                 Promise.all([
                     DB.insertPageBody({
                         pageId: this.pageInfo.id,

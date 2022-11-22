@@ -244,7 +244,8 @@ export class Core
 
                 const updatedInfo = await DB.getPage(userId, id);
                 const wathcer = new WebPageWatcher(this, updatedInfo);
-                wathcer.start();
+                // wathcer.start();
+                watcher.checkImmediately(true);
                 this.pageWatchers.push(wathcer);
 
             }
