@@ -243,10 +243,10 @@ export class Core
                 this.watchers.splice(index, 1);
 
                 const updatedInfo = await DB.getPage(userId, id);
-                const wathcer = new WebPageWatcher(this, updatedInfo);
-                // wathcer.start();
+                const watcher = new WebPageWatcher(this, updatedInfo);
+                // watcher.start();
                 watcher.checkImmediately(true);
-                this.pageWatchers.push(wathcer);
+                this.pageWatchers.push(watcher);
 
             }
 
