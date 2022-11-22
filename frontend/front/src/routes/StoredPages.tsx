@@ -42,6 +42,10 @@ export default function StoredPages() {
 
     const isPageLoading = useRef<boolean>(false);
 
+    useEffect(()=>{
+
+        getPages(PAGE_BLOCK_SIZE);
+    },[])
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -133,7 +137,7 @@ export default function StoredPages() {
 
     const openPage = async (event: React.MouseEvent<HTMLElement>, id:string, url:string) => {
         window.open(url);
-        event.currentTarget.style.borderColor = "White";
+        event.currentTarget.style.borderColor = "white";
         // event.target
         try {
             const response = await axios({

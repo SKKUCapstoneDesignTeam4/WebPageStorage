@@ -13,7 +13,7 @@ import SideMenu from '../components/SideMenu';
 import Cookies from "universal-cookie";
 
 import { ColumnProps } from "antd/lib/table";
-import "antd/dist/antd.css";
+import "antd/dist/antd.min.css";
 
 
 const { Header, Content, Sider } = Layout;
