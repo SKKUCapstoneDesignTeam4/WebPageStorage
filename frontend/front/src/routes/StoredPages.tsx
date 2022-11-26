@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment'
-import { Breadcrumb, Button, Card, Layout, Row, Space, Col, message, Tag } from 'antd';
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-} from '@ant-design/icons';
+import { Breadcrumb, Button, Card, Layout, Row, Space, Col, message, Tag} from 'antd';
 import SideMenu from '../components/SideMenu';
 import SideHeader from '../components/SiteHeader';
 
@@ -14,8 +10,7 @@ import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
 
-const { Title } = Typography;
-const { Header, Content, } = Layout;
+const {Content, } = Layout;
 const {Meta} = Card;
 interface DataType {
     desc: string;
@@ -33,7 +28,6 @@ const PAGE_BLOCK_SIZE = 10;
 
 
 export default function StoredPages() {
-    const [collapsed, setCollapsed] = useState(false);
     const [datas, setDatas] = useState<DataType[]>([]);
     //const datas = useRef<DataType[]>();
     const countPageLoaded = useRef(0);

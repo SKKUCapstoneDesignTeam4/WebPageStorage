@@ -6,11 +6,10 @@ import Login from './routes/Login';
 import StoredPages from './routes/StoredPages';
 import Bookmark from './routes/Bookmark'
 import Registered from './routes/Registered'
-import Setting from './routes/Setting'
 
 function App() {
-  axios.defaults.baseURL = "https://wps-server.cube219.me/";
-  // axios.defaults.baseURL = "http://localhost:4000/";
+  //axios.defaults.baseURL = "https://wps-server.cube219.me/";
+  axios.defaults.baseURL = "http://localhost:4000/";
   return (
     <>
       <Router>

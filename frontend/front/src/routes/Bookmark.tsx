@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Breadcrumb,Button,Card, Layout, Row, Col,} from 'antd';
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-} from '@ant-design/icons';
 import SideMenu from '../components/SideMenu';
 import './Bookmark.css';
+import SiteHeader from '../components/SiteHeader';
 
 const { Header, Content, Sider, } = Layout;
 
 
 export default function Bookmark(){
-
-    const [collapsed, setCollapsed] = useState(false);
     const cols_new = [];
     const colCount = 6;
 
@@ -33,22 +27,9 @@ export default function Bookmark(){
 
     return(
         <Layout style={{ minHeight: '100vh' }}>
-            <Header className="site-layout-background" style={{ padding: 0 }}>
-                <Row>
-                    <Col>
-                        <Button className="Menu-Button" onClick={()=>setCollapsed((prev)=>!prev)} style={{ marginBottom: 16 }}>
-                            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                        </Button>
-                    </Col>
-                    <Col>
-                        <div><h1 className="title">Web Page Storage</h1></div>
-                    </Col>
-                </Row>
-            </Header>
+            <SideMenu/>
             <Layout className="site-layout">
-                <Sider collapsible collapsed={collapsed} trigger={null} onCollapse={value => setCollapsed(value)} collapsedWidth="0">
-                    <SideMenu/>
-                </Sider>
+                <SiteHeader/>
                 <Content style={{ margin: '0 16px' }}>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                         <Breadcrumb.Item className='Category-title'>
