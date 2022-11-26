@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Registered.css';
 import axios from 'axios';
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-} from '@ant-design/icons';
 
 import { Button, Breadcrumb, Input, Layout, Col, Row,Popconfirm, InputNumber, Form, Table, Typography, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -14,9 +10,10 @@ import Cookies from "universal-cookie";
 
 import { ColumnProps } from "antd/lib/table";
 import "antd/dist/antd.min.css";
+import SiteHeader from '../components/SiteHeader';
 
 
-const { Header, Content, Sider } = Layout;
+const { Content} = Layout;
 const { Text } = Typography;
 
 const cookies = new Cookies();
@@ -310,23 +307,9 @@ export default function Registered() {
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
-
-            <Header className="site-layout-background" style={{ padding: 0 }}>
-                <Row>
-                    <Col>
-                        <Button className="Menu-Button" onClick={() => setCollapsed((prev) => !prev)} style={{ marginBottom: 16 }}>
-                            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                        </Button>
-                    </Col>
-                    <Col>
-                        <div><h1 className="title">Web Page Storage</h1></div>
-                    </Col>
-                </Row>
-            </Header>
+            <SideMenu/>
             <Layout className="site-layout">
-                <Sider collapsible collapsed={collapsed} trigger={null} onCollapse={value => setCollapsed(value)} collapsedWidth="0">
-                    <SideMenu />
-                </Sider>
+                <SiteHeader/>
                 <Content style={{ margin: '0 16px' }}>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                         <Breadcrumb.Item className='Category-title'>
