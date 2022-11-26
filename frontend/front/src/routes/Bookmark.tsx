@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Breadcrumb,Button,Card, Layout, Row, Col,} from 'antd';
 import SideMenu from '../components/SideMenu';
-import './Bookmark.css';
 import SiteHeader from '../components/SiteHeader';
 
 const { Header, Content, Sider, } = Layout;

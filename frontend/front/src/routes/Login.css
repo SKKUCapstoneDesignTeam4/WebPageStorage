@@ -12,7 +12,7 @@
 }
 
 .Login-area {
-    background-color: #0041b3;
+    background-color: rgb(0,21,41);
     min-height: 100vh;
     display: flex;
     flex-direction: column;

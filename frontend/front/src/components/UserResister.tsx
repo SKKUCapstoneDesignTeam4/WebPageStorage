@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input, Col, Row, Typography, message } from 'antd';
+import { Button, Input, Col, Row, Typography, message, Modal } from 'antd';
 
 import axios from 'axios'
 import './design/UserResister.css'
@@ -8,21 +8,22 @@ const { Title, Text } = Typography;
 
 export function UserResister() {
 
-    const [id, SetId] = React.useState("");
-    const [password, SetPassword] = React.useState("");
+    const [isResister, setResister]=useState(false);
+    const [res_id, SetResId] = React.useState("");
+    const [res_password, SetResPassword] = React.useState("");
     const [password_confirm, SetPasswordConfirm] = React.useState("");
 
 
     const register = async () => {
-        if (id===""){
+        if (res_id===""){
             message.error('Please type ID');
             return;
         }
-        if (password===""){
+        if (res_password===""){
             message.error('Please type PW');
             return;
         }
-        if (password!==password_confirm){
+        if (res_password!==password_confirm){
             message.error('Please check PW');
             return;
         }
@@ -31,7 +32,7 @@ export function UserResister() {
                 url: "api/register",
                 method: "post",
                 data: {
-                    id: id, password: password
+                    id: res_id, password: res_password
                 }
             });
         }
@@ -41,15 +42,28 @@ export function UserResister() {
         }
     }
 
+    const showModal = () => {
+        setResister(true);
+    };
+    
+    const handleOk = () => {
+        register();
+        setResister(false);
+    };
+    
+    const handleCancel = () => {
+        setResister(false);
+    };
+
     return (
-        <>
+        <Modal title="User Resister" open={isResister} onOk={handleOk} onCancel={handleCancel}>
             <Row align='middle' justify='center' >
                 <Col>
                     <Input
                         id="id"
                         placeholder="ID"
-                        value={id} 
-                        onChange={({ target: { value } }) => SetId(value)} 
+                        value={res_id} 
+                        onChange={({ target: { value } }) => SetResId(value)} 
                     />
                 </Col>
             </Row>
@@ -58,8 +72,8 @@ export function UserResister() {
                     <Input.Password
                         id="password"
                         placeholder="Password"
-                        value={password} 
-                        onChange={({ target: { value } }) => SetPassword(value)} 
+                        value={res_password} 
+                        onChange={({ target: { value } }) => SetResPassword(value)} 
                     /> 
                 </Col>
             </Row>
@@ -73,12 +87,7 @@ export function UserResister() {
                     /> 
                 </Col>
             </Row>
-            <Row align='bottom' justify='end'>                  
-                <Col span={2} offset={16}>
-                    <Button size='small' onClick={register}>Resister</Button>
-                </Col>
-            </Row>            
-        </>
+        </Modal>
       )
 } 
 
