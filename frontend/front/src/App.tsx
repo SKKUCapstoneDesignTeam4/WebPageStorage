@@ -19,7 +19,6 @@ function App() {
           <Route path="/StoredPages" element={<StoredPages />} />
           <Route path="/Bookmark" element={<Bookmark />} />
           <Route path="/Registered" element={<Registered />} />
-          <Route path="/Setting" element={<Setting />} />
         </Routes>
       </Router>
     </>

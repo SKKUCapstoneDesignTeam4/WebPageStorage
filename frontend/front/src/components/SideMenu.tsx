@@ -25,11 +25,6 @@ export function SideMenu(){
                     <span>Registerd Sites</span>
                   </Link>
                 </Menu.Item>
-                <Menu.Item key="4">
-                  <Link to="/Setting">
-                    <span>Settings</span>
-                  </Link>
-                </Menu.Item>
         </Menu>
     );
 }

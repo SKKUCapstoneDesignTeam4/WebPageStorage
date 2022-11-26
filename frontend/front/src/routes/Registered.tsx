@@ -29,7 +29,6 @@ export interface DataType {
     key: string;
     name: string;
     address: string;
-    Description: string;
     cssSelector : string;
   }
 
@@ -83,7 +82,6 @@ export default function Registered() {
 
     const [name, SetName] = React.useState("");
     const [address, SetAddress] = React.useState("");
-    const [description, SetDescription] = React.useState("");
     const [css, SetCSS] = React.useState("");
     const [collapsed, setCollapsed] = useState(false);
     const [datas, setDatas] = useState<DataType[]>([]);
@@ -95,7 +93,7 @@ export default function Registered() {
   const isEditing = (record: DataType) => record.key === editingKey;
 
   const edit = (record: Partial<DataType> & { key: React.Key }) => {
-    form.setFieldsValue({ name: '', address: '', description: '', ...record });
+    form.setFieldsValue({ name: '', address: '', ...record });
     setEditingKey(record.key);
   };
 
@@ -142,13 +140,6 @@ export default function Registered() {
       dataIndex: 'url',
       key: 'address',
     //   width: '15%',
-      editable: true,
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-    //   width: '40%',
       editable: true,
     },
     {
@@ -378,14 +369,6 @@ export default function Registered() {
                                 placeholder="Address"
                                 value={address}
                                 onChange={({ target: { value } }) => SetAddress(value)}
-                            />
-                        </Col>
-                        <Col>
-                            <Input
-                                id="Description"
-                                placeholder="Description"
-                                value={description}
-                                onChange={({ target: { value } }) => SetDescription(value)}
                             />
                         </Col>
                         <Col>
