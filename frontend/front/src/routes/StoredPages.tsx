@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment'
-import { Breadcrumb, Button, Card, Layout, Row, Col, message, Tag } from 'antd';
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-} from '@ant-design/icons';
+import { Breadcrumb, Button, Card, Layout, Row, Col, message, Tag, Typography } from 'antd';
+
 import SideMenu from '../components/SideMenu';
-import './StoredPages.css';
+import SideHeader from '../components/SiteHeader';
+
 
 import axios from 'axios';
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
 
-const { Header, Content, Sider, } = Layout;
+const { Title } = Typography;
+const { Header, Content, } = Layout;
 const {Meta} = Card;
 interface DataType {
     desc: string;
@@ -177,7 +176,7 @@ export default function StoredPages() {
                             cover={ datas[i].thumbnailUrl === "" ? "" : <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> } 
                             style={ datas[i].isRead===0 ? {borderColor: "red", width: 350 } : {width: 350}} 
                             onClick={(event: React.MouseEvent<HTMLElement>)=>openPage(event, datas[i].id, datas[i].url)}
-                            extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
+                            extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New🚀</Tag> : ""}>
                                 <Meta description={datas[i].url}></Meta> 
                             </Card>
                         </div>
@@ -189,28 +188,14 @@ export default function StoredPages() {
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
-            <Header className="site-layout-background" style={{ padding: 0 }}>
-                <Row>
-                    <Col>
-                        <Button className="Menu-Button" onClick={() => setCollapsed((prev) => !prev)} style={{ marginBottom: 16 }}>
-                            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                        </Button>
-                    </Col>
-                    <Col>
-                        <div><h1 className="title">Web Page Storage</h1></div>
-                    </Col>
-                </Row>
-            </Header>
+            <SideMenu/>
             <Layout className="site-layout">
-                <Sider collapsible collapsed={collapsed} trigger={null} onCollapse={value => setCollapsed(value)} collapsedWidth="0">
-                    <SideMenu />
-                </Sider>
+                <SideHeader/>
                 <Content style={{ margin: '0 16px' }}>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                         <Breadcrumb.Item className='Category-title'>
-                                <span>New</span>
+                                <span>Stored Pages</span>
                         </Breadcrumb.Item>
-
                     </Breadcrumb>
                     <Row gutter={[0, 24]} style={{ minHeight: 520 }}>
                         {cols_new}
@@ -218,7 +203,6 @@ export default function StoredPages() {
                 </Content>
             </Layout>
             <div ref={setBottom} />
-
         </Layout>
     );
 }
