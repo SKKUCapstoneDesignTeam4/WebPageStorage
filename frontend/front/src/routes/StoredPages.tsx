@@ -174,7 +174,7 @@ export default function StoredPages() {
                         <div>
                             <Card title={datas[i].title} 
                             hoverable 
-                            cover={ datas[i].thumbnailUrl === "" ? <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> : ""} 
+                            cover={ datas[i].thumbnailUrl === "" ? "" : <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> } 
                             style={ datas[i].isRead===0 ? {borderColor: "red", width: 350 } : {width: 350}} 
                             onClick={(event: React.MouseEvent<HTMLElement>)=>openPage(event, datas[i].id, datas[i].url)}
                             extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
