@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment'
-import { Breadcrumb, Button, Card, Layout, Row, Col, message, Tag } from 'antd';
+import { Breadcrumb, Button, Card, Layout, Row, Space, Col, message, Tag } from 'antd';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -161,28 +161,22 @@ export default function StoredPages() {
     for (let i = 0; i < datas.length; i++) {
         cols_new.push(
             <div key={i.toString()}>
-                <Row>
+                {/* <Row>
                     <Col offset={18}>
                         <Button type='default'>★</Button>
                     </Col>
                     <Col>
                         <Button type='default' onClick={()=>deletePage(datas[i].id)}>X</Button>
                     </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <div>
-                            <Card title={datas[i].title} 
-                            hoverable 
-                            cover={ datas[i].thumbnailUrl === "" ? <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> : ""} 
-                            style={ datas[i].isRead===0 ? {borderColor: "red", width: 350 } : {width: 350}} 
-                            onClick={(event: React.MouseEvent<HTMLElement>)=>openPage(event, datas[i].id, datas[i].url)}
-                            extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
-                                <Meta description={datas[i].url}></Meta> 
-                            </Card>
-                        </div>
-                    </Col>,
-                </Row>
+                </Row> */}
+                <Card  
+                hoverable 
+                cover={ datas[i].thumbnailUrl === "" ? "" : <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> } 
+                style={ datas[i].isRead===0 ? {borderColor: "red", width: 250 } : {width: 250}} 
+                onClick={(event: React.MouseEvent<HTMLElement>)=>openPage(event, datas[i].id, datas[i].url)}
+                extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
+                    <Meta title={datas[i].title} description={datas[i].url}></Meta>
+                </Card>
             </div>
         );
     }
@@ -212,9 +206,9 @@ export default function StoredPages() {
                         </Breadcrumb.Item>
 
                     </Breadcrumb>
-                    <Row gutter={[0, 24]} style={{ minHeight: 520 }}>
+                    <Space size={[8,16]} wrap align="start">
                         {cols_new}
-                    </Row>
+                    </Space>
                 </Content>
             </Layout>
             <div ref={setBottom} />
