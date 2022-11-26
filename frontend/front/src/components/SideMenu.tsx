@@ -7,8 +7,8 @@ import {
 } from '@ant-design/icons';
 
 import type { MenuProps } from 'antd';
-import { Breadcrumb, Layout, Menu } from 'antd';
-const { Header, Content, Footer, Sider } = Layout;
+import {Layout, Menu } from 'antd';
+const {Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
