@@ -8,8 +8,8 @@ import Bookmark from './routes/Bookmark'
 import Registered from './routes/Registered'
 
 function App() {
-  // axios.defaults.baseURL = "https://wps-server.cube219.me/";
-  axios.defaults.baseURL = "http://localhost:4000/";
+  axios.defaults.baseURL = "https://wps-server.cube219.me/";
+  // axios.defaults.baseURL = "http://localhost:4000/";
   return (
     <>
       <Router>

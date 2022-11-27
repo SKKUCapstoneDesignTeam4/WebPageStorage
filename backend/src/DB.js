@@ -42,7 +42,7 @@ class DB
         await Promise.all([
             this.db.exec("CREATE TABLE IF NOT EXISTS user_info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, password TEXT)"),
             this.db.exec("CREATE TABLE IF NOT EXISTS web_site_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, crawl_url TEXT, css_selector TEXT, last_url TEXT, owner_user_id INTEGER)"),
-            this.db.exec("CREATE TABLE IF NOT EXISTS web_page_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, thumbnail_url TEXT, desc TEXT, time TEXT, is_read INTEGER, is_bookmarked INTEGER, site_id INTEGER, owner_user_id INTEGER)"),
+            this.db.exec("CREATE TABLE IF NOT EXISTS web_page_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, thumbnail_url TEXT, desc TEXT, time TEXT, is_read INTEGER, site_id INTEGER, owner_user_id INTEGER)"),
             this.db.exec("CREATE TABLE IF NOT EXISTS web_page_body_info (id INTEGER PRIMARY KEY AUTOINCREMENT, page_id INTEGER, time TEXT, body TEXT)")
         ]);
 
@@ -56,6 +56,9 @@ class DB
             }
             if(columnInfos.find((e) => e.name === "is_deleted") === undefined) {
                 await this.db.exec("ALTER TABLE web_page_info ADD COLUMN is_deleted DEFAULT 0");
+            }
+            if(columnInfos.find((e) => e.name === "is_bookmarked") === undefined) {
+                await this.db.exec("ALTER TABLE web_page_info ADD COLUMN is_bookmarked DEFAULT 0");
             }
         }
     }
