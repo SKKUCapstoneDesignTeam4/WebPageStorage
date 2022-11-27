@@ -16,7 +16,6 @@ import fs from "fs";
 import { logger } from "./Logger.js";
 import { Core } from "./Core.js";
 import { InvalidRequestError } from "./Error.js";
-import { Console } from "winston/lib/winston/transports/index.js";
 
 export class APIServer
 {
