@@ -8,7 +8,7 @@
 .table {
     background-color: darkgrey;
     width: 1200px;
-    border: 2px;
+    border: 0px;
     border-color: aliceblue;
     align-content: center;
     padding-left: 300px;
@@ -16,16 +16,17 @@
 }
 
 th {
-    border: 1px solid #444444;
+    border: 0px;
     height: 30px;
-    background-color: antiquewhite;
+    border-left: 1px solid #ccc;
 }
 
 tr,
 td {
-    border: 1px solid #444444;
+    border: 0px !important;;
+    border-left: 1px solid #ccc !important;
+    /* border-top */
     height: 30px;
-    background-color: aliceblue;
 }
 
 .name {
