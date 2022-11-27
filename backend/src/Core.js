@@ -207,7 +207,7 @@ export class Core
             if(index == -1) {
                 logger.warn(`Core: Cannot find the page in page wachter.\n        id: ${id}\n`);
             } else {
-                this.pageWatchers[idx].stop();
+                this.pageWatchers[index].stop();
                 this.pageWatchers.splice(index, 1);
             }
 
