@@ -52,13 +52,13 @@ class DB
             const columnInfos = await this.db.all(`PRAGMA table_info(web_page_info)`);
 
             if(columnInfos.find((e) => e.name === "is_updated") === undefined) {
-                await this.db.exec("ALTER TABLE web_page_info ADD COLUMN is_updated DEFAULT 0");
+                await this.db.exec("ALTER TABLE web_page_info ADD COLUMN is_updated INTEGER DEFAULT 0");
             }
             if(columnInfos.find((e) => e.name === "is_deleted") === undefined) {
-                await this.db.exec("ALTER TABLE web_page_info ADD COLUMN is_deleted DEFAULT 0");
+                await this.db.exec("ALTER TABLE web_page_info ADD COLUMN is_deleted INTEGER DEFAULT 0");
             }
             if(columnInfos.find((e) => e.name === "is_bookmarked") === undefined) {
-                await this.db.exec("ALTER TABLE web_page_info ADD COLUMN is_bookmarked DEFAULT 0");
+                await this.db.exec("ALTER TABLE web_page_info ADD COLUMN is_bookmarked INTEGER DEFAULT 0");
             }
         }
     }
