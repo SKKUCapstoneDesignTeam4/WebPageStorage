@@ -76,6 +76,7 @@ export async function getPageInfo(pageUrl)
         desc: desc,
         time: moment().toDate().toISOString(),
         isRead: 0,
+        isBookmarked: 0,
         siteId: "",
         OwnerUserId: ""
     };

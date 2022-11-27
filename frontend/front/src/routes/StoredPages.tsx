@@ -3,6 +3,7 @@ import moment from 'moment'
 import { Badge, Breadcrumb, Card, Layout, Space, message, Tag } from 'antd';
 import {
     StarOutlined,
+    StarFilled,
     DeleteOutlined
 } from '@ant-design/icons';
 import SideMenu from '../components/SideMenu';
@@ -20,6 +21,7 @@ interface DataType {
     desc: string;
     id: string;
     isRead: number;
+    isBookmarked: number;
     ownerUserId: string;
     siteId: string;
     thumbnailUrl: string;
@@ -137,6 +139,41 @@ export default function StoredPages() {
         }
     }
 
+    const bookmarkPage = async (id:string) => {
+        try {
+            const response = await axios({
+                url: `api/page/bookmark/${id}`,
+                method: "put",
+                headers: {
+                    "x-access-token": cookies.get('access_token')
+                },
+            });
+            getPages(PAGE_BLOCK_SIZE);
+        }
+        catch (ex) {
+            message.error("Can't delete page")
+            return;
+        }
+    }
+
+    const removeBookmarkOnPage = async (id:string) => {
+        try {
+            const response = await axios({
+                url: `api/page/bookmark/${id}`,
+                method: "delete",
+                headers: {
+                    "x-access-token": cookies.get('access_token')
+                },
+            });
+            getPages(PAGE_BLOCK_SIZE);
+        }
+        catch (ex) {
+            message.error("Can't delete page")
+            return;
+        }
+    }
+
+
     const openPage = async (event: React.MouseEvent<HTMLElement>, id:string, url:string) => {
         window.open(url);
         event.currentTarget.style.borderColor = "white";
@@ -168,9 +205,12 @@ export default function StoredPages() {
                     hoverable 
                     cover={ datas[i].thumbnailUrl === "" ? "" : <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> }
                     actions={[
-                        <StarOutlined />,
-                        <DeleteOutlined onClick={()=>deletePage(datas[i].id)} />,
+                            (datas[i].isBookmarked 
+                            ? <StarFilled onClick={()=>(datas[i].id)} />  
+                            : <StarOutlined onClick={()=>bookmarkPage(datas[i].id)} /> ),
+                            <DeleteOutlined onClick={()=>removeBookmarkOnPage(datas[i].id)} />
                     ]}
+                    
                     style={ {width: 250} }
                     className={ datas[i].isRead === 0 ? "isUnRead" : undefined }
                     onClick={

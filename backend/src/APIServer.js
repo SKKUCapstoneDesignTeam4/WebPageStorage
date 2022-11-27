@@ -16,6 +16,7 @@ import fs from "fs";
 import { logger } from "./Logger.js";
 import { Core } from "./Core.js";
 import { InvalidRequestError } from "./Error.js";
+import { Console } from "winston/lib/winston/transports/index.js";
 
 export class APIServer
 {
@@ -144,6 +145,10 @@ export class APIServer
         router.get("/api/pages", this.getPages.bind(this));
         router.delete("/api/page/:id", this.removePage.bind(this));
         router.put("/api/page/read/:id", this.markPageAsRead.bind(this));
+                
+        router.get("/api/pages/bookmark", this.getBookmarkedPages.bind(this));
+        router.put("/api/page/bookmark/:id", this.bookmarkPage.bind(this));
+        router.delete("/api/page/bookmark/:id", this.removeBookmarkOnPage.bind(this));
 
         router.get("/api/sites", this.getSites.bind(this));
         router.post("/api/site", this.addSite.bind(this));
@@ -310,6 +315,59 @@ export class APIServer
             throw e;
         }
     }
+
+    
+    // GET: /api/pages/bookmark
+    async getBookmarkedPages(ctx, next)
+    {
+        const params = ctx.query;
+
+        try 
+        {
+            const res = await this.core.getBookmarkedPages(ctx.state.userId, {
+                afterId: params.afterId,
+                count: parseInt(params.count)
+            });
+
+            ctx.response.status = 200;
+            ctx.body = res;
+        } catch(e) {
+            e.message += `\n        Request parameters: ${JSON.stringify(params)}`;
+            throw e;
+        }
+    }
+
+
+    // PUT: /api/page/bookmark/:id
+    async bookmarkPage(ctx, next)
+    {
+        const params = ctx.request.body;
+        let setBookmark = true;
+
+        try {
+            await this.core.bookmarkPage(ctx.state.userId, ctx.params.id, setBookmark);
+            ctx.status = 204;
+        } catch(e) {
+            e.message += `\n        Page id: ${ctx.params.id}`;
+            throw e;
+        }
+    }
+
+    // DELETE: /api/page/bookmark/:id
+    async removeBookmarkOnPage(ctx, next)
+    {
+        const params = ctx.request.body;
+        let setBookmark = false;
+
+        try {
+            await this.core.bookmarkPage(ctx.state.userId, ctx.params.id, setBookmark);
+            ctx.status = 204;
+        } catch(e) {
+            e.message += `\n        Page id: ${ctx.params.id}`;
+            throw e;
+        }
+    }
+    
 
     // GET: /api/sites
     async getSites(ctx, next)

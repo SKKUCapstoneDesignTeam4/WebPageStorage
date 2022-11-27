@@ -42,7 +42,7 @@ class DB
         await Promise.all([
             this.db.exec("CREATE TABLE IF NOT EXISTS user_info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, password TEXT)"),
             this.db.exec("CREATE TABLE IF NOT EXISTS web_site_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, crawl_url TEXT, css_selector TEXT, last_url TEXT, owner_user_id INTEGER)"),
-            this.db.exec("CREATE TABLE IF NOT EXISTS web_page_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, thumbnail_url TEXT, desc TEXT, time TEXT, is_read INTEGER, site_id INTEGER, owner_user_id INTEGER)"),
+            this.db.exec("CREATE TABLE IF NOT EXISTS web_page_info (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, url TEXT, thumbnail_url TEXT, desc TEXT, time TEXT, is_read INTEGER, is_bookmarked INTEGER, site_id INTEGER, owner_user_id INTEGER)"),
             this.db.exec("CREATE TABLE IF NOT EXISTS web_page_body_info (id INTEGER PRIMARY KEY AUTOINCREMENT, page_id INTEGER, time TEXT, body TEXT)")
         ]);
 
@@ -207,11 +207,30 @@ class DB
         return toCamelCase(res);
     }
 
+    async getBookmarkedPages(userId, params)
+    {
+        let query = SQL`SELECT * FROM web_page_info WHERE owner_user_id=${userId} AND is_bookmarked=1`;
+        if(userId == -1) {
+            query = SQL`SELECT * FROM web_page_info WHERE is_bookmarked=1`;
+        } else {
+            if(params.afterId) {
+                query.append(SQL` AND id < ${params.afterId}`);
+            }
+            query.append(SQL` ORDER BY id DESC`);
+            if(params.count) {
+                query.append(SQL` LIMIT ${params.count}`);
+            }
+        }
+
+        const res = await this.db.all(query);
+        return res.map(function(e){ return toCamelCase(e) });
+    }
+
     async insertPage(webPageInfo)
     {
-        let query = SQL`INSERT INTO web_page_info (title, url, thumbnail_url, desc, time, is_read, site_id, owner_user_id) `;
+        let query = SQL`INSERT INTO web_page_info (title, url, thumbnail_url, desc, time, is_read, is_bookmarked, site_id, owner_user_id) `;
         query.append(SQL`VALUES (${webPageInfo.title}, ${webPageInfo.url}, ${webPageInfo.thumbnailUrl}, ${webPageInfo.desc},
-                                 ${webPageInfo.time}, ${webPageInfo.isRead}, ${webPageInfo.siteId}, ${webPageInfo.ownerUserId})`);
+                                 ${webPageInfo.time}, ${webPageInfo.isRead}, ${webPageInfo.isBookmarked} , ${webPageInfo.siteId}, ${webPageInfo.ownerUserId})`);
 
         const res = await this.db.run(query);
         return res.lastID;
@@ -237,6 +256,7 @@ class DB
         if(params.desc !== undefined) paramString.push(`desc="${params.desc}"`);
         if(params.time !== undefined) paramString.push(`time="${params.time}"`);
         if(params.isRead !== undefined) paramString.push(`is_read=${params.isRead}`);
+        if(params.isBookmarked !== undefined) paramString.push(`is_bookmarked=${params.isBookmarked}`);
         if(params.siteId !== undefined) paramString.push(`site_id=${params.siteId}`);
         if(params.ownerUserId !== undefined) paramString.push(`owner_user_id=${params.ownerUserId}`);
         if(params.isUpdated !== undefined) paramString.push(`is_updated=${params.isUpdated}`);

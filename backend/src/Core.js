@@ -227,6 +227,21 @@ export class Core
         }
     }
 
+    async bookmarkPage(userId, id, setBookmark)
+    {
+        const res = await DB.updatePage(userId, id, { isBookmarked: setBookmark ? 1 : 0 });
+        if(res == 0) {
+            throw new InvalidRequestError("Page not found", 404);
+        } else if(res == -1) {
+            // Do nothing
+        }  
+    }
+
+    async getBookmarkedPages(userId, params)
+    {
+        return DB.getBookmarkedPages(userId, params);
+    }
+
     async updatePage(userId, id, params)
     {
         const res = await DB.updatePage(userId, id, params);
