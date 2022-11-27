@@ -254,7 +254,7 @@ export default function StoredPages() {
                 <Content ref={contentHeight} style={{ margin: '0 16px' }}>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                         <Breadcrumb.Item className='Category-title'>
-                                <span>Stored Pages</span>
+                                <span>Bookmark</span>
                         </Breadcrumb.Item>
                     </Breadcrumb>
                     <Space size={[10,18]} wrap align="start">
