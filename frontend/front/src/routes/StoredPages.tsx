@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment'
-import { Breadcrumb, Button, Card, Layout, Row, Space, Col, message, Tag} from 'antd';
+import { Badge, Breadcrumb, Card, Layout, Space, message, Tag } from 'antd';
+import {
+    StarOutlined,
+    DeleteOutlined
+} from '@ant-design/icons';
 import SideMenu from '../components/SideMenu';
 import SideHeader from '../components/SiteHeader';
 
@@ -157,22 +161,28 @@ export default function StoredPages() {
     for (let i = 0; i < datas.length; i++) {
         cols_new.push(
             <div key={i.toString()}>
-                {/* <Row>
-                    <Col offset={18}>
-                        <Button type='default'>★</Button>
-                    </Col>
-                    <Col>
-                        <Button type='default' onClick={()=>deletePage(datas[i].id)}>X</Button>
-                    </Col>
-                </Row> */}
-                <Card  
-                hoverable 
-                cover={ datas[i].thumbnailUrl === "" ? "" : <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> } 
-                style={ datas[i].isRead===0 ? {borderColor: "red", width: 250 } : {width: 250}} 
-                onClick={(event: React.MouseEvent<HTMLElement>)=>openPage(event, datas[i].id, datas[i].url)}
-                extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
-                    <Meta title={datas[i].title} description={datas[i].url}></Meta>
-                </Card>
+                <Badge.Ribbon text="">
+                    <Card  
+                    hoverable 
+                    cover={ datas[i].thumbnailUrl === "" ? "" : <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> }
+                    actions={[
+                        <StarOutlined />,
+                        <DeleteOutlined onClick={()=>deletePage(datas[i].id)} />,
+                    ]}
+                    style={ {width: 250} }
+                    className={ datas[i].isRead === 0 ? "isUnRead" : undefined }
+                    onClick={
+                        (event: React.MouseEvent<HTMLElement>)=>{
+                            // Open page except clicking action buttons (star, delete)
+                            if((event.target as Element).closest(".ant-card-actions") === null) {
+                                openPage(event, datas[i].id, datas[i].url)
+                            }
+                        }
+                    }
+                    extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
+                        <Meta title={datas[i].title} description={datas[i].url}></Meta>
+                    </Card>
+                </Badge.Ribbon>
             </div>
         );
     }
@@ -188,7 +198,7 @@ export default function StoredPages() {
                                 <span>Stored Pages</span>
                         </Breadcrumb.Item>
                     </Breadcrumb>
-                    <Space size={[8,16]} wrap align="start">
+                    <Space size={[10,18]} wrap align="start">
                         {cols_new}
                     </Space>
                 </Content>
