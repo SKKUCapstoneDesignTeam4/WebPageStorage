@@ -219,7 +219,9 @@ export class Core
 
     async readPage(userId, id, setUnread)
     {
-        const res = await DB.updatePage(userId, id, { isRead: setUnread ? 0 : 1 });
+        let params = { isRead: setUnread ? 0 : 1 };
+        if(!setUnread) params.isUpdated = 0;
+        const res = await DB.updatePage(userId, id, params);
         if(res == 0) {
             throw new InvalidRequestError("Page not found", 404);
         } else if(res == -1) {
