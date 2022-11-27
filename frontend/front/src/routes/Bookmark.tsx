@@ -28,6 +28,8 @@ interface DataType {
     time: string;
     title: string;
     url: string;
+    isUpdated: number;
+    isDeleted: number;
 }
 
 const PAGE_BLOCK_SIZE = 10;
@@ -122,6 +124,39 @@ export default function StoredPages() {
         }
     };
 
+    const deletePage = async (id:string) => {
+        try {
+            const response = await axios({
+                url: `api/page/${id}`,
+                method: "delete",
+                headers: {
+                    "x-access-token": cookies.get('access_token')
+                },
+            });
+            getPages(PAGE_BLOCK_SIZE);
+        }
+        catch (ex) {
+            message.error("Can't delete page")
+            return;
+        }
+    }
+
+    const bookmarkPage = async (id:string) => {
+        try {
+            const response = await axios({
+                url: `api/page/bookmark/${id}`,
+                method: "put",
+                headers: {
+                    "x-access-token": cookies.get('access_token')
+                },
+            });
+            getPages(PAGE_BLOCK_SIZE);
+        }
+        catch (ex) {
+            message.error("Can't delete page")
+            return;
+        }
+    }
 
     const removeBookmarkOnPage = async (id:string) => {
         try {
@@ -165,32 +200,50 @@ export default function StoredPages() {
     const cols_new = [];
     var yesterday = moment().subtract(1,'days').format('YYYY-MM-DD');
     for (let i = 0; i < datas.length; i++) {
-        cols_new.push(
-            <div key={i.toString()}>
-                <Badge.Ribbon text="">
-                    <Card  
-                    hoverable 
-                    cover={ datas[i].thumbnailUrl === "" ? "" : <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> }
-                    actions={[
-                            <DeleteOutlined onClick={()=>removeBookmarkOnPage(datas[i].id)} />
-                    ]}
-                    
-                    style={ {width: 250} }
-                    className={ datas[i].isRead === 0 ? "isUnRead" : undefined }
-                    onClick={
-                        (event: React.MouseEvent<HTMLElement>)=>{
-                            // Open page except clicking action buttons (star, delete)
-                            if((event.target as Element).closest(".ant-card-actions") === null) {
-                                openPage(event, datas[i].id, datas[i].url)
-                            }
+        const card = (<div key={i.toString()}>
+            <Card  
+                hoverable
+                cover={ datas[i].thumbnailUrl === "" ? "" : <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> }
+                actions={[
+                    (datas[i].isBookmarked 
+                        ? <StarFilled onClick={()=>removeBookmarkOnPage(datas[i].id)} />  
+                        : <StarOutlined onClick={()=>bookmarkPage(datas[i].id)} /> ),
+                    <DeleteOutlined onClick={()=>deletePage(datas[i].id)} />
+                ]}
+                
+                style={ {width: 250} }
+                className={ datas[i].isRead === 0 ? "isUnRead" : undefined }
+                onClick={
+                    (event: React.MouseEvent<HTMLElement>)=>{
+                        // Open page except clicking action buttons (star, delete)
+                        if((event.target as Element).closest(".ant-card-actions") === null) {
+                            openPage(event, datas[i].id, datas[i].url)
                         }
                     }
-                    extra={moment(datas[i].time).isAfter(yesterday) ? <Tag color="red">New!</Tag> : ""}>
-                        <Meta title={datas[i].title} description={datas[i].url}></Meta>
-                    </Card>
+                }>
+
+                <Meta title={datas[i].title} description={datas[i].url}></Meta>
+            </Card>
+        </div>);
+
+        let cardWithBadge: JSX.Element;
+        if(datas[i].isDeleted === 1) {
+            cardWithBadge = (
+                <Badge.Ribbon text="Deleted" color="red">
+                    {card}
                 </Badge.Ribbon>
-            </div>
-        );
+            );
+        } else if(datas[i].isUpdated === 1) {
+            cardWithBadge = (
+                <Badge.Ribbon text="Updated">
+                    {card}
+                </Badge.Ribbon>
+            );
+        } else {
+            cardWithBadge = card;
+        }
+        
+        cols_new.push(cardWithBadge);
     }
 
     return (
