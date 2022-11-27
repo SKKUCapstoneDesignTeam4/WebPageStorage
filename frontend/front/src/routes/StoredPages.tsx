@@ -35,7 +35,7 @@ export default function StoredPages() {
     const [datas, setDatas] = useState<DataType[]>([]);
     //const datas = useRef<DataType[]>();
     const countPageLoaded = useRef(0);
-
+    const contentHeight = useRef<HTMLElement>(null);
 
     const [bottom, setBottom] = useState<HTMLDivElement | null>(null);
     const bottomObserver = useRef<IntersectionObserver>();
@@ -110,7 +110,9 @@ export default function StoredPages() {
     
     const handleScroll = () => {
         // 스크롤바가 없을 시 휠을 하면 새 페이지 생성
-        if(!isPageLoading.current && document.body.scrollHeight == document.body.clientHeight)
+        const { scrollTop } = document.documentElement
+        const offsetHeight = contentHeight.current!.offsetHeight;
+        if(!isPageLoading.current && window.innerHeight + scrollTop + 500 >= offsetHeight)
         {
             isPageLoading.current = true;
             countPageLoaded.current +=  PAGE_BLOCK_SIZE;
@@ -192,7 +194,7 @@ export default function StoredPages() {
             <SideMenu/>
             <Layout className="site-layout">
                 <SideHeader/>
-                <Content style={{ margin: '0 16px' }}>
+                <Content ref={contentHeight} style={{ margin: '0 16px' }}>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                         <Breadcrumb.Item className='Category-title'>
                                 <span>Stored Pages</span>
