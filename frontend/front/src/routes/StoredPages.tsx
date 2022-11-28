@@ -134,7 +134,7 @@ export default function StoredPages() {
                     "x-access-token": cookies.get('access_token')
                 },
             });
-            getPages(PAGE_BLOCK_SIZE);
+            getPages(countPageLoaded.current);
         }
         catch (ex) {
             message.error("Can't delete page")
@@ -151,7 +151,7 @@ export default function StoredPages() {
                     "x-access-token": cookies.get('access_token')
                 },
             });
-            getPages(PAGE_BLOCK_SIZE);
+            getPages(countPageLoaded.current);
         }
         catch (ex) {
             message.error("Can't delete page")
@@ -168,7 +168,7 @@ export default function StoredPages() {
                     "x-access-token": cookies.get('access_token')
                 },
             });
-            getPages(PAGE_BLOCK_SIZE);
+            getPages(countPageLoaded.current);
         }
         catch (ex) {
             message.error("Can't delete page")
@@ -188,9 +188,9 @@ export default function StoredPages() {
                 headers: {
                     "x-access-token": cookies.get('access_token')
                 },
-            }).then(()=>{
-                console.log(document.getElementById(id));
             });
+
+            getPages(countPageLoaded.current);
         }
         catch (ex) {
             message.error("Can't read page")
