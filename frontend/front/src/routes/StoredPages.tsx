@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment'
-import { Badge, Breadcrumb, Card, Layout, Space, message, Tag } from 'antd';
+import { Badge, Breadcrumb, Card, Layout, Space, message, Popconfirm } from 'antd';
 import {
     StarOutlined,
     StarFilled,
@@ -68,7 +68,7 @@ export default function StoredPages() {
 
     useEffect(() => {
         const observer = bottomObserver.current;
-        if(observer == undefined)
+        if(observer === undefined)
             return;
         if(bottom){
             observer.observe(bottom);
@@ -111,7 +111,7 @@ export default function StoredPages() {
         return () => {
             window.removeEventListener('wheel', handleScroll); //clean up
         };
-    }, []);
+    });
     
     const handleScroll = () => {
         // 스크롤바가 없을 시 휠을 하면 새 페이지 생성
@@ -127,7 +127,7 @@ export default function StoredPages() {
 
     const deletePage = async (id:string) => {
         try {
-            const response = await axios({
+            await axios({
                 url: `api/page/${id}`,
                 method: "delete",
                 headers: {
@@ -144,7 +144,7 @@ export default function StoredPages() {
 
     const bookmarkPage = async (id:string) => {
         try {
-            const response = await axios({
+            await axios({
                 url: `api/page/bookmark/${id}`,
                 method: "put",
                 headers: {
@@ -161,7 +161,7 @@ export default function StoredPages() {
 
     const removeBookmarkOnPage = async (id:string) => {
         try {
-            const response = await axios({
+            await axios({
                 url: `api/page/bookmark/${id}`,
                 method: "delete",
                 headers: {
@@ -182,7 +182,7 @@ export default function StoredPages() {
         event.currentTarget.style.borderColor = "white";
         // event.target
         try {
-            const response = await axios({
+            await axios({
                 url: `api/page/read/${id}`,
                 method: "put",
                 headers: {
@@ -207,17 +207,23 @@ export default function StoredPages() {
                 cover={ datas[i].thumbnailUrl === "" ? "" : <img alt="thumnail" src={axios.defaults.baseURL + datas[i].thumbnailUrl}/> }
                 actions={[
                     (datas[i].isBookmarked 
-                        ? <StarFilled onClick={()=>removeBookmarkOnPage(datas[i].id)} />  
+                        ? <StarFilled style={ {color:"#fadb14"}} onClick={()=>removeBookmarkOnPage(datas[i].id)} />  
                         : <StarOutlined onClick={()=>bookmarkPage(datas[i].id)} /> ),
-                    <DeleteOutlined onClick={()=>deletePage(datas[i].id)} />
+
+                    <Popconfirm
+                        title="Are you sure to delete this page?"
+                        onConfirm={()=>deletePage(datas[i].id)}>
+                        <DeleteOutlined /* onClick={()=>deletePage(datas[i].id)} */ />
+                    </Popconfirm>
                 ]}
                 
                 style={ {width: 250} }
                 className={ datas[i].isRead === 0 ? "isUnRead" : undefined }
                 onClick={
                     (event: React.MouseEvent<HTMLElement>)=>{
-                        // Open page except clicking action buttons (star, delete)
-                        if((event.target as Element).closest(".ant-card-actions") === null) {
+                        // Open page except clicking action buttons (star, delete) and popover
+                        if((event.target as Element).closest(".ant-card-actions") === null && 
+                            (event.target as Element).closest(".ant-popover") === null) {
                             openPage(event, datas[i].id, datas[i].url)
                         }
                     }
