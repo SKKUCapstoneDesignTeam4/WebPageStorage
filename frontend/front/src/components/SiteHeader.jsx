@@ -18,7 +18,7 @@ export function SiteHeader(){
     <Header className="site-layout-background" style={{ padding: 0 }}>
       <Row>
         <Col span={8} offset={8}>
-          <Title level={2} className="site-title">Web Page Storage</Title>
+          <Title level={2} className="site-title">Crowler</Title>
         </Col>
         <Col offset={7}>
           <Button type="primary" shape='circle' icon={<LogoutOutlined/>} danger onClick={()=>navigate("/")}/>
