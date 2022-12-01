@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {useNavigate} from "react-router-dom";
-import { Button, Input,Typography, message, Modal, Space, Layout, Card, Form, Divider } from 'antd';
+import { Button, Input,Typography, message, Modal, Space, Layout, Card, Form, Divider, Image } from 'antd';
 import './Login.css';
 
 import axios from 'axios'
@@ -75,11 +75,12 @@ export function Login(){
     };
 
     return(
-        <Layout style={{ minHeight: '100vh', alignItems:'center', justifyContent:'center', backgroundColor:"white"}}>
+        <Layout style={{ minHeight: '100vh', alignItems:'center', justifyContent:'center', background: "linear-gradient( to right, #4b6cb7, #182848 )"}}>
             <Space direction='horizontal'>
                 <Space direction='vertical' style={{"marginRight":200}}>
-                    <Title style={{"color": 'rgb(0,21,41)'}}>Crowler</Title>
-                    <Title level={4} style={{"color": 'rgb(0,21,41)'}}>Gather the interesting pages in one place!</Title>
+                    <Image alt='title_icon' src="img/crowler_icon.png" width={350}></Image>
+                    <Title style={{"color": 'white'}}>Crowler</Title>
+                    <Title level={4} style={{"color": 'white'}}>Gather the interesting pages in one place!</Title>
                 </Space>
                 <Space>
                     <Card style={{ width: 400, borderColor:"black"}} bordered={true}>
