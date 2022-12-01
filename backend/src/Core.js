@@ -106,6 +106,9 @@ export class Core
 
     async removeWebSite(userId, id, deleteAllPages)
     {
+        if(deleteAllPages === true || deleteAllPages === "true") deleteAllPages = true;
+        else deleteAllPages = false;
+
         const deleteNum = await DB.deleteWebSite(userId, id, deleteAllPages);
 
         if(deleteNum != 0) {
