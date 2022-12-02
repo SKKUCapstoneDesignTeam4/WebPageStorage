@@ -4,6 +4,7 @@ import {
   HddFilled,
   StarFilled,
   ToolFilled,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
 
 import type { MenuProps } from 'antd';
@@ -36,6 +37,7 @@ export function SideMenu(){
     getItem('Stored Pages', '1', <HddFilled />),
     getItem('Bookmark', '2', <StarFilled />),
     getItem('Register', '3', <ToolFilled />),
+    getItem('Help', '4', <QuestionCircleOutlined />)
   ];
 
   const onClick: MenuProps['onClick'] = (e) => {
@@ -46,6 +48,8 @@ export function SideMenu(){
       navigate('/Bookmark');
     }else if (e.key === '3'){
       navigate('/Registered');
+    }else if (e.key == '4'){
+      navigate('/Help');
     }
   };
 

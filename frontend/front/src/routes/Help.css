@@ -1,0 +1,32 @@
+@import '~antd/dist/antd.min.css';
+
+@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css); 
+
+ul{
+    margin : 0;
+    padding-left: 2em;
+    padding-bottom: 1em;
+}
+
+li{
+    margin: 0;
+    padding: 0;
+}
+
+img{
+    width: 90%;
+}
+
+img[alt='small']{
+    width: 30%;
+}
+
+body{
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size : 1.1em;
+}
+
+hr{
+    width: 90%;
+    margin-left: 0;
+}
